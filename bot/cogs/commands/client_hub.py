@@ -582,7 +582,15 @@ class ClientHub(commands.Cog, name="clients"):
                 except Exception:
                     channel = None
             return channel
-        return discord.utils.get(guild.text_channels, name=text)
+        exact = discord.utils.get(guild.text_channels, name=text)
+        if exact is not None:
+            return exact
+        needle = text.strip().lower()
+        for channel in guild.text_channels:
+            name = channel.name.lower()
+            if name.endswith(needle) or needle in name:
+                return channel
+        return None
 
     @client.command(name="setup", description="Create or refresh the delivery panel.")
     @discord.app_commands.describe(
@@ -605,6 +613,33 @@ class ClientHub(commands.Cog, name="clients"):
             await self.say(ctx, "<:zcross:1571192938698907779> Run this in a text channel to place the panel.", ephemeral=True)
             return
         channel = target
+        me = ctx.guild.me
+        if me is None:
+            await self.say(
+                ctx,
+                "<:zcross:1571192938698907779> I'm **not a member of this server**, so I can't post the panel.\n"
+                "Invite me with **View Channels**, **Send Messages**, **Embed Links** and **Attach Files**, then run `/client setup` again.",
+                ephemeral=True,
+            )
+            return
+        perms = channel.permissions_for(me)
+        if perms is not None:
+            needed = [
+                ("View Channel", perms.view_channel),
+                ("Send Messages", perms.send_messages),
+                ("Embed Links", perms.embed_links),
+                ("Attach Files", perms.attach_files),
+            ]
+            missing = [name for name, ok in needed if not ok]
+            if missing:
+                await self.say(
+                    ctx,
+                    f"<:zcross:1571192938698907779> I can't post in {channel.mention} — missing: "
+                    + ", ".join(f"**{name}**" for name in missing)
+                    + ".\nGive the bot those permissions (Channel → Permissions) or pick another channel.",
+                    ephemeral=True,
+                )
+                return
         fields = {"channel_id": channel.id}
         if role is not None:
             fields["role_id"] = role.id

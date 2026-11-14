@@ -159,6 +159,24 @@ class PanelView(discord.ui.View):
             )
 
 
+# ── permissions ─────────────────────────────────────────────────────────────
+class _ClientStaffError(commands.CheckFailure, discord.app_commands.CheckFailure):
+    """Raised by both the prefix and the slash handler with a clear reason."""
+
+
+def _client_staff():
+    """Allow owners, admins, Manage Server and Manage Messages (moderators)."""
+    async def predicate(ctx: commands.Context) -> bool:
+        author = ctx.author
+        if await ctx.bot.is_owner(author):
+            return True
+        perms = getattr(author, "guild_permissions", None)
+        if perms and (perms.administrator or perms.manage_guild or perms.manage_messages):
+            return True
+        raise _ClientStaffError("You need **Manage Server** or **Manage Messages** to manage clients.")
+    return commands.check(predicate)
+
+
 class ClientHub(commands.Cog, name="clients"):
     """Client delivery panel with private `.jar` downloads."""
 
@@ -529,7 +547,7 @@ class ClientHub(commands.Cog, name="clients"):
         invoke_without_command=True,
     )
     @commands.guild_only()
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def client(self, ctx: commands.Context):
         await self.defer(ctx)
         config = await self.get_config(ctx.guild.id)
@@ -547,7 +565,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, embed=embed)
 
     @client.command(name="setup", description="Create or refresh the delivery panel.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def setup(self, ctx: commands.Context, channel: discord.TextChannel = None, role: discord.Role = None):
         await self.defer(ctx)
         channel = channel or ctx.channel
@@ -566,7 +584,7 @@ class ClientHub(commands.Cog, name="clients"):
         )
 
     @client.command(name="add", description="Upload a client file to the panel.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def add(
         self,
         ctx: commands.Context,
@@ -606,7 +624,7 @@ class ClientHub(commands.Cog, name="clients"):
         )
 
     @client.command(name="scan", description="Import clients from the clients/ folder on the host.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def scan(self, ctx: commands.Context):
         await ctx.defer(ephemeral=True)
         found = store.scan(ctx.guild.id)
@@ -627,7 +645,7 @@ class ClientHub(commands.Cog, name="clients"):
         )
 
     @client.command(name="list", description="List every client on the panel.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def list_clients_cmd(self, ctx: commands.Context):
         rows = await self.list_clients(ctx.guild.id)
         if not rows:
@@ -649,7 +667,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, embed=embed)
 
     @client.command(name="remove", description="Delete a client and its file.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def remove(self, ctx: commands.Context, name: str):
         await self.defer(ctx)
         rows = await self.list_clients(ctx.guild.id)
@@ -670,7 +688,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, f"<:delete:1571192625413881866> **{match['name']}** removed.", ephemeral=True)
 
     @client.command(name="edit", description="Edit a client's version, emoji, notes or file.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def edit(
         self,
         ctx: commands.Context,
@@ -717,7 +735,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, f"<:ztick:1571192911532392561> **{meta['name']}** updated.", ephemeral=True)
 
     @client.command(name="panel", description="Edit the panel embed (title, description, banner, color).")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def panel(
         self,
         ctx: commands.Context,
@@ -770,7 +788,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, f"<:ztick:1571192911532392561> Panel updated ({', '.join(fields)}).", ephemeral=True)
 
     @client.command(name="role", description="Choose the role allowed to download clients.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def role(self, ctx: commands.Context, role: discord.Role = None):
         await self.defer(ctx)
         if role is None:
@@ -780,7 +798,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.say(ctx, f"<:ztick:1571192911532392561> Only {role.mention} can download clients.", ephemeral=True)
 
     @client.command(name="stats", description="Download statistics.")
-    @commands.has_guild_permissions(manage_guild=True)
+    @_client_staff()
     async def stats(self, ctx: commands.Context):
         await self.defer(ctx)
         config = await self.get_config(ctx.guild.id)

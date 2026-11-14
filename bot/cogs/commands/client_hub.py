@@ -566,9 +566,17 @@ class ClientHub(commands.Cog, name="clients"):
 
     @client.command(name="setup", description="Create or refresh the delivery panel.")
     @_client_staff()
-    async def setup(self, ctx: commands.Context, channel: discord.TextChannel = None, role: discord.Role = None):
+    async def setup(self, ctx: commands.Context, channel: discord.abc.GuildChannel = None, role: discord.Role = None):
         await self.defer(ctx)
+        # Accept any channel from the picker (text, news, voice…) and fall back to
+        # a usable text channel instead of failing during argument conversion.
+        if channel is not None and not isinstance(channel, (discord.TextChannel, discord.Thread)):
+            await self.say(ctx, "<:zcross:1571192938698907779> That is not a text channel — using this channel instead.", ephemeral=True)
+            channel = None
         channel = channel or ctx.channel
+        if not isinstance(channel, (discord.TextChannel, discord.Thread)):
+            await self.say(ctx, "<:zcross:1571192938698907779> Run this in a text channel (or pass one) to place the panel.", ephemeral=True)
+            return
         fields = {"channel_id": channel.id}
         if role is not None:
             fields["role_id"] = role.id

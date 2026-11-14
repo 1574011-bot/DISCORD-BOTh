@@ -98,6 +98,17 @@ class zyrox(commands.AutoShardedBot):
     # ── error handling ────────────────────────────────────────────────────────
 
     @staticmethod
+    def _unwrap(error: BaseException) -> BaseException:
+        """Dig through HybridCommandError/CommandInvokeError to the real cause."""
+        seen = set()
+        while True:
+            nxt = getattr(error, "original", None)
+            if nxt is None or id(nxt) in seen or id(error) in seen:
+                return error
+            seen.add(id(error))
+            error = nxt
+
+    @staticmethod
     def _log_command_error(kind: str, name: str, user, error: BaseException) -> None:
         try:
             import os, datetime
@@ -111,7 +122,7 @@ class zyrox(commands.AutoShardedBot):
 
     async def on_app_command_error(self, interaction: discord.Interaction, error: Exception) -> None:
         """Answer /app commands instead of failing silently."""
-        original = getattr(error, "original", error)
+        original = self._unwrap(error)
         self._log_command_error("APP", getattr(interaction.command, "qualified_name", "?"), interaction.user, original)
         if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
             return  # interaction expired (slow gateway) — nothing left to answer
@@ -129,9 +140,13 @@ class zyrox(commands.AutoShardedBot):
         elif isinstance(original, ac.CheckFailure):
             message = f"🔒 {original}" if str(original) else "🔒 You can't use this command here."
         elif isinstance(original, ac.TransformerError):
+            # TransformerError has no `.param` — use the option type instead.
+            option = getattr(original, "param", None) or original.type.name
             message = (
-                f"❌ I couldn't read `{original.param}`. Mention it like `#channel`, "
-                "`@role` or pick it from the list that Discord shows."
+                f"❌ I couldn't read the `{option}` option. Pick it again from Discord's "
+                "list, or use the prefix form: `>client setup #channel`."
+                if option == "channel"
+                else f"❌ I couldn't read the `{option}` option — pick it again from Discord's list."
             )
         else:
             message = f"❌ Something went wrong (`{type(original).__name__}`). It was logged — try again in a moment."
@@ -149,7 +164,7 @@ class zyrox(commands.AutoShardedBot):
         if isinstance(error, (commands.CommandNotFound, commands.DisabledCommand)):
             return
 
-        original = getattr(error, "original", error)
+        original = self._unwrap(error)
         if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
             return  # interaction expired (slow gateway) — nothing left to answer
         traceback.print_exception(type(original), original, original.__traceback__)

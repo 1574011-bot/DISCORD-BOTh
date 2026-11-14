@@ -386,7 +386,7 @@ class General(commands.Cog):
       invite_text = (
           "```Empower your server with blazing-fast features and 24/7 support!```\n"
           f"{ZYROXLINKS} **Quick Actions**\n"
-          f">>> **[Invite {BotName}](https://discord.com/oauth2/authorize?client_id=1396114795102470196&permissions=8&integration_type=0&scope=bot+applications.commands)**\n"
+          f">>> **[Invite {BotName}](https://discord.com/oauth2/authorize?client_id=1570963159450128604&permissions=8&integration_type=0&scope=bot+applications.commands)**\n"
           "**[Support Server](https://discord.gg/und)**"
       )
       await ctx.send(view=CV2(f"{ZYROXCONNECTION} {BotName} Integration Hub!", invite_text))

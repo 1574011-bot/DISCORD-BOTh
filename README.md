@@ -176,7 +176,7 @@ TOKEN              = your_discord_bot_token
 brand_name         = 'UND'
 
 # ── Owner IDs (comma-separated) ───────────────────────────────────
-OWNER_IDS          = 870179991462236170,767979794411028491
+OWNER_IDS          = 1462466148770648189
 
 # ── Lavalink ──────────────────────────────────────────────────────
 LAVALINK_HOST      = "your-lavalink-host"

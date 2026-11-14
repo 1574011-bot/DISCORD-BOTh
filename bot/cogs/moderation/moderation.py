@@ -308,7 +308,7 @@ class Moderation(commands.Cog):
             description="I can't manage roles for a user with a higher or equal role!"
         )
 
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -318,7 +318,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description="You can't manage roles for a user with a higher or equal role than yours!"
         )
-        error.set_author(name="Access Denied", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Access Denied", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -330,7 +330,7 @@ class Moderation(commands.Cog):
                 color=self.color,
                 description=f"Successfully **added** role {role.name} to {member.mention}."
             )
-            success.set_author(name="Role Added", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+            success.set_author(name="Role Added", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
             success.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         else:
@@ -339,7 +339,7 @@ class Moderation(commands.Cog):
                 color=self.color,
                 description=f"Successfully **removed** role {role.name} from {member.mention}."
             )
-            success.set_author(name="Role Removed", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+            success.set_author(name="Role Removed", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
             success.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         await ctx.send(embed=success)
@@ -565,7 +565,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description="I don't have permission to manage channels!"
         )
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -578,7 +578,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description=f"{channel.name} has been successfully cloned"
         )
-        success.set_author(name="Success", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        success.set_author(name="Success", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         success.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         await ctx.send(embed=success)
@@ -587,14 +587,14 @@ class Moderation(commands.Cog):
             color=self.color,
             description="I don't have permission to clone channels!"
         )
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         await ctx.send(embed=error)
     except Exception as e:
         error = discord.Embed(
             color=self.color,
             description=f"An error occurred while trying to clone the channel: {str(e)}"
         )
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         await ctx.send(embed=error)
         
 
@@ -614,7 +614,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description="I can't change the nickname of the server owner!"
         )
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -625,7 +625,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description="I can't change the nickname of a user with a higher or equal role than mine!"
         )
-        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
             icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -636,7 +636,7 @@ class Moderation(commands.Cog):
             color=self.color,
             description="You can't change the nickname of a user with a higher or equal role than you!"
         )
-        error.set_author(name="Access Denied", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error.set_author(name="Access Denied", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=error)
@@ -648,7 +648,7 @@ class Moderation(commands.Cog):
                 color=self.color,
                 description=f"Successfully changed nickname of {member.mention} to {name}."
             )
-            success.set_author(name="Nickname Updated", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+            success.set_author(name="Nickname Updated", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
             success.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         else:
@@ -656,7 +656,7 @@ class Moderation(commands.Cog):
                 color=self.color,
                 description=f"Successfully cleared nickname of {member.mention}."
             )
-            success.set_author(name="Nickname Cleared", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+            success.set_author(name="Nickname Cleared", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
             success.set_footer(text=f"Requested by {ctx.author}",
                 icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         await ctx.send(embed=success)
@@ -699,7 +699,7 @@ class Moderation(commands.Cog):
           embed = discord.Embed(
             description="Channel has been Successfully nuked by **`%s`**" % (ctx.author),
             color=self.color)
-          embed.set_author(name="Channel Nuked", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+          embed.set_author(name="Channel Nuked", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
           embed.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
           await newchannel.send(embed=embed)
@@ -750,7 +750,7 @@ class Moderation(commands.Cog):
     if seconds > 120:
       embed=discord.Embed(description="Slowmode can not be over 2 minutes",
                             color=self.color)
-      embed.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+      embed.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
       embed.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
       return await ctx.send(embed=embed)
@@ -762,7 +762,7 @@ class Moderation(commands.Cog):
       await ctx.channel.edit(slowmode_delay=seconds)
       embed=discord.Embed(description="Successfully Set slowmode to **`%s`**" % (seconds),
                             color=self.color)
-      embed.set_author(name="Slowmode Activated", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+      embed.set_author(name="Slowmode Activated", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
       embed.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
       await ctx.send(embed=embed)
@@ -780,7 +780,7 @@ class Moderation(commands.Cog):
   async def _unslowmode(self, ctx: commands.Context):
     await ctx.channel.edit(slowmode_delay=0)
     embed=discord.Embed(description="Successfully Disabled slowmode", color=self.color)
-    embed.set_author(name="Unslowmode", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+    embed.set_author(name="Unslowmode", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
     embed.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
     await ctx.send(embed=embed)
@@ -871,7 +871,7 @@ class Moderation(commands.Cog):
             description=f"{role.mention} is higher than my role. Please move my role above it.",
             color=self.color
         )
-        error_embed.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1396114795102470196/198b9bc616ec574f6fd2f7121a1d3abc.png?size=1024")
+        error_embed.set_author(name="Error", icon_url="https://cdn.discordapp.com/avatars/1570963159450128604/324f02b6e488203640c5958732af54b6.png?size=1024")
         error_embed.set_footer(
             text=f"Requested by {ctx.author}",
             icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url

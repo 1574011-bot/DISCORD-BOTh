@@ -1,0 +1,36 @@
+# Core bot
+discord.py
+discord-ext-menus
+jishaku
+aiohttp
+aiofiles
+httpx
+requests
+PyYAML
+python-dotenv
+colorama
+python-dateutil
+pytz
+psutil
+
+# Dashboard API backend
+fastapi
+uvicorn==0.46.0
+slowapi
+aiosqlite
+
+# Features
+numpy
+Pillow
+langdetect
+deep-translator==1.11.4
+duckduckgo-search==6.3.6
+openai
+gtts
+chess
+mcstatus
+wavelink>=2.0.0
+pycloudflared
+
+# NOTE: `prodia` is no longer published on PyPI. The /imagine command
+# degrades gracefully when it is missing (see cogs/commands/imagine.py).

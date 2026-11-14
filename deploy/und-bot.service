@@ -1,0 +1,23 @@
+[Unit]
+Description=UND — All In One Discord Bot
+Documentation=https://github.com/RayExo/ZyroX-CV2-AIO-With-Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=und
+Group=und
+WorkingDirectory=/opt/und/bot
+# The bot reads /opt/und/bot/.env itself (python-dotenv), so we do not pass
+# EnvironmentFile= here: systemd would keep the surrounding quotes.
+ExecStart=/opt/und/bot/.venv/bin/python UND.py
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -182,6 +182,7 @@ class JoinToCreate(commands.Cog):
                         else:
                             view = ControlPanelView(self, guild)
                             msg = await control_channel.send(view=view)
+                            self.bot.add_view(view, message_id=msg.id)
                             self.setup_data[guild_id]["control_message_id"] = msg.id
                             await self.save_guild_setup(guild_id, self.setup_data[guild_id])
                 except Exception as e:
@@ -291,7 +292,7 @@ class JoinToCreate(commands.Cog):
                 )
                 
                 await member.move_to(vc)
-                
+
                 self.private_channels[vc.id] = {
                     "owner": member.id,
                     "limit": 2,
@@ -303,6 +304,15 @@ class JoinToCreate(commands.Cog):
                 }
                 await self.save_private_channel(vc.id, member.guild.id, self.private_channels[vc.id])
                 await self.update_control_panel(member.guild)
+
+                # Put the control panel inside the new VC's own chat so the
+                # owner can manage the room without leaving voice.
+                try:
+                    panel_view = ControlPanelView(self, member.guild)
+                    panel_message = await vc.send(view=panel_view)
+                    self.bot.add_view(panel_view, message_id=panel_message.id)
+                except discord.HTTPException:
+                    pass
             finally:
                 self.creating_vc.discard(member.id)
             

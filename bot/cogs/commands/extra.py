@@ -18,7 +18,7 @@ from utils.cv2 import CV2, build_container
 import psutil
 import time
 from utils.Tools import *
-from discord.ext import commands, menus
+from discord.ext import menus
 from discord.ext.commands import BucketType, cooldown
 import requests
 from typing import *

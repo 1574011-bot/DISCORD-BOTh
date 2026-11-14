@@ -11,12 +11,10 @@ import discord
 from utils.emoji import TICK
 from discord.ext import commands, tasks
 import asyncio
-import datetime
 import re
 from typing import *
 from utils.Tools import *
 from discord.ui import Button, View
-from typing import Union, Optional
 from typing import Union, Optional
 from io import BytesIO
 import requests
@@ -32,16 +30,16 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 def convert(argument):
   args = argument.lower()
   matches = re.findall(time_regex, args)
-  time = 0
+  total = 0
   for key, value in matches:
     try:
-      time += time_dict[value] * float(key)
+      total += time_dict[value] * float(key)
     except KeyError:
       raise commands.BadArgument(
         f"{value} is an invalid time key! h|m|s|d are valid arguments")
     except ValueError:
       raise commands.BadArgument(f"{key} is not a number!")
-  return round(time)
+  return round(total)
 
 async def do_removal(ctx, limit, predicate, *, before=None, after=None):
   if limit > 2000:

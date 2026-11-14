@@ -12,7 +12,6 @@ import discord
 from utils.emoji import CROSS, TICK, ZWARNING, ZYROXCONNECTION, ZYROXLINKS
 from discord.ext import commands, tasks
 from discord.utils import get
-import datetime
 import random
 import requests
 import aiohttp

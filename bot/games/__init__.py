@@ -60,7 +60,7 @@ class VersionInfo(NamedTuple):
     micro: int
 
 
-version_info: VersionInfo = VersionInfo(
+version_info = VersionInfo(
     major=1,
     minor=10,
     micro=6,

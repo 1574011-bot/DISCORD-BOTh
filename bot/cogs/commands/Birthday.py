@@ -14,7 +14,7 @@ import datetime
 import asyncio
 import os
 from discord.ui import LayoutView, TextDisplay, Separator, Container
-from utils.cv2 import CV2, build_container
+from utils.cv2 import build_container
 
 class CV2(LayoutView):
     def __init__(self, title, *sections):

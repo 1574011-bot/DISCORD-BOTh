@@ -311,7 +311,6 @@ async def reaction(ctx: Context):
 
 # ---API Server for Dashboard Backend ---
 import uvicorn
-from threading import Thread
 from api.server import create_app
 from api.dependencies import set_bot
 

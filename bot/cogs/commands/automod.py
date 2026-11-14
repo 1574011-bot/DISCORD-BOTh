@@ -12,7 +12,7 @@ from utils.emoji import CROSS, DISABLE, ENABLE, TICK, TICK_ALT
 from discord.ext import commands
 import aiosqlite
 from utils.Tools import *
-from utils.cv2 import CV2, build_container
+from utils.cv2 import build_container
 from discord.ui import LayoutView, TextDisplay, Separator, Container, ActionRow
 from utils.config import *
 class CV2(LayoutView):

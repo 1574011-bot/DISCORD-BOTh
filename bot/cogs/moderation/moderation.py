@@ -10,7 +10,6 @@
 import discord
 from utils.emoji import CROSS, DENIED, TICK, ZWARNING
 import asyncio
-import datetime
 import re
 import typing
 import typing as t
@@ -22,7 +21,6 @@ from discord.ext import commands, tasks
 from discord.ui import Button, View
 from typing import Union, Optional
 from utils import Paginator, DescriptionEmbedPaginator, FieldPagePaginator, TextPaginator
-from typing import Union, Optional
 from io import BytesIO
 import requests
 import aiohttp
@@ -41,16 +39,16 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 def convert(argument):
   args = argument.lower()
   matches = re.findall(time_regex, args)
-  time = 0
+  total = 0
   for key, value in matches:
     try:
-      time += time_dict[value] * float(key)
+      total += time_dict[value] * float(key)
     except KeyError:
       raise commands.BadArgument(
         f"{value} is an invalid time key! h|m|s|d are valid arguments")
     except ValueError:
       raise commands.BadArgument(f"{key} is not a number!")
-  return round(time)
+  return round(total)
 
 async def do_removal(ctx, limit, predicate, *, before=None, after=None):
     if limit > 2000:
@@ -96,15 +94,15 @@ class Moderation(commands.Cog):
     self.color = 0xFF0000
     self.sniped = {}
 
-  def convert(self, time):
+  def convert(self, raw):
     pos = ["s", "m", "h", "d"]
 
     time_dict = {"s": 1, "m": 60, "h": 3600, "d": 3600 * 24}
-    unit = time[-1]
+    unit = raw[-1]
     if unit not in pos:
       return -1
     try:
-      val = int(time[:-1])
+      val = int(raw[:-1])
     except:
       return -2
     return val * time_dict[unit]

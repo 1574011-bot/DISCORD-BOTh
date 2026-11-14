@@ -9,15 +9,12 @@
 
 import discord
 from utils.emoji import CROSS, TICK, ZWARNING
-import discord
 from discord.ext import commands, tasks
 import asyncio
-import datetime
 import re
 from typing import *
 from utils.Tools import *
 from discord.ui import Button, View
-from typing import Union, Optional
 from typing import Union, Optional
 from io import BytesIO
 import requests
@@ -33,16 +30,16 @@ time_dict = {"h": 3600, "s": 1, "m": 60, "d": 86400}
 def convert(argument):
   args = argument.lower()
   matches = re.findall(time_regex, args)
-  time = 0
+  total = 0
   for key, value in matches:
     try:
-      time += time_dict[value] * float(key)
+      total += time_dict[value] * float(key)
     except KeyError:
       raise commands.BadArgument(
         f"{value} is an invalid time key! h|m|s|d are valid arguments")
     except ValueError:
       raise commands.BadArgument(f"{key} is not a number!")
-  return round(time)
+  return round(total)
 
 
 class Role(commands.Cog):
@@ -127,7 +124,7 @@ class Role(commands.Cog):
   @commands.cooldown(1, 7, commands.BucketType.user)
   @commands.has_permissions(manage_roles=True)
   @commands.bot_has_permissions(manage_roles=True)
-  async def temp(self, ctx, role: discord.Role, time, *, user: discord.Member):
+  async def temp(self, ctx, role: discord.Role, duration, *, user: discord.Member):
     if ctx.author != ctx.guild.owner and role.position >= ctx.author.top_role.position:
         embed = discord.Embed(
               description=f"You can't manage a role that is higher or equal to your top role!",
@@ -148,7 +145,7 @@ class Role(commands.Cog):
         embed1.set_footer(text=f"Requested by {ctx.author}",
                         icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
         return await ctx.send(embed=embed1)
-    seconds = convert(time)
+    seconds = convert(duration)
     await user.add_roles(role, reason=None)
     success = discord.Embed(
       description=

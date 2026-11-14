@@ -16,7 +16,6 @@ import string
 import discord
 from discord.ext import commands
 from utils.emoji import TARGET
-from utils.emoji import TARGET
 
 from ..battleship import (
     BattleShip,

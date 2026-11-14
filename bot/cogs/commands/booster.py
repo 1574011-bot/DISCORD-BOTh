@@ -16,7 +16,6 @@ import aiosqlite
 import json 
 from discord .ext import commands 
 from utils .Tools import *
-from discord .ext .commands import Context 
 from discord import app_commands 
 import time 
 import datetime 
@@ -25,7 +24,7 @@ from typing import *
 from time import strftime 
 from core import Cog ,zyrox ,Context 
 from discord.ui import LayoutView, TextDisplay, Separator, Container
-from utils.cv2 import CV2, build_container
+from utils.cv2 import build_container
 
 class CV2(LayoutView):
     def __init__(self, title, *sections):

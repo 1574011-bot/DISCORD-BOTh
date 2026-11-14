@@ -27,7 +27,6 @@ import os
 import requests
 import numpy as np
 from io import BytesIO
-from utils.config import OWNER_IDS, BOT_OWNER_IDS
 from discord.errors import Forbidden
 from discord import Embed
 from discord.ui import Button, View

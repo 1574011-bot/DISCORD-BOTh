@@ -14,7 +14,7 @@ import random
 from typing import List, Tuple, Union
 from PIL import Image
 from utils.Tools import *
-from utils.cv2 import CV2, build_container
+from utils.cv2 import build_container
 from discord.ui import LayoutView, TextDisplay, Separator, Container
 
 class CV2(LayoutView):

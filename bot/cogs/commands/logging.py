@@ -49,7 +49,7 @@ MAX_SEARCH_RESULTS = 100
 Path(LOGS_DIR).mkdir(exist_ok=True)
 
 from utils.cv2 import CV2, build_container
-from discord.ui import TextDisplay, Separator, ActionRow, LayoutView, Container, Select
+from discord.ui import TextDisplay, Separator, ActionRow, LayoutView, Container
 
 
 class LogSetupLayoutView(LayoutView):

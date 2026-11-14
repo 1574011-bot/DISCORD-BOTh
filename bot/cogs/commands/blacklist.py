@@ -14,7 +14,7 @@ from discord.ext import menus
 import aiosqlite
 import os
 from utils.Tools import *
-from utils.cv2 import CV2, build_container
+from utils.cv2 import build_container
 from typing import Union
 from discord.ui import LayoutView, TextDisplay, Separator, Container
 

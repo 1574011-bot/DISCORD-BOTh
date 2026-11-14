@@ -33,6 +33,36 @@ extensions: List[str] = [
     "cogs"
 ]
 
+def _install_ui_safety() -> None:
+    """Never let a button/modal die silently: answer with a friendly message."""
+    async def _on_component_error(self, interaction, error, item=None):
+        original = getattr(error, "original", error)
+        if isinstance(original, discord.NotFound) and getattr(original, "code", None) in (10062, 10013):
+            return  # interaction expired
+        traceback.print_exception(type(original), original, original.__traceback__)
+        text = (
+            "❌ This menu expired — run the command again."
+            if isinstance(original, discord.NotFound)
+            else f"❌ Something went wrong (`{type(original).__name__}`). Try again in a moment."
+        )
+        try:
+            if interaction.response.is_done():
+                await interaction.followup.send(text, ephemeral=True)
+            else:
+                await interaction.response.send_message(text, ephemeral=True)
+        except discord.HTTPException:
+            pass
+
+    if not getattr(discord.ui.View, "_und_safe_error", False):
+        discord.ui.View.on_error = _on_component_error
+        discord.ui.Modal.on_error = _on_component_error
+        discord.ui.View._und_safe_error = True
+        discord.ui.Modal._und_safe_error = True
+
+
+_install_ui_safety()
+
+
 class zyrox(commands.AutoShardedBot):
     def __init__(self, *arg, **kwargs):
         intents = discord.Intents.all()
@@ -81,7 +111,10 @@ class zyrox(commands.AutoShardedBot):
         elif isinstance(original, ac.CheckFailure):
             message = f"🔒 {original}" if str(original) else "🔒 You can't use this command here."
         elif isinstance(original, ac.TransformerError):
-            message = f"❌ Bad argument for `{original.param}`: {original}"
+            message = (
+                f"❌ I couldn't read `{original.param}`. Mention it like `#channel`, "
+                "`@role` or pick it from the list that Discord shows."
+            )
         else:
             message = f"❌ Something went wrong (`{type(original).__name__}`). It was logged — try again in a moment."
 

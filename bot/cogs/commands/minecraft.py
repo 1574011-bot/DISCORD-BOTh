@@ -63,10 +63,32 @@ class SetupModal(ui.Modal, title="Minecraft Server Setup"):
         if not detected_type or not status or not status['online']:
             await interaction.followup.send(f"{EMOJI_ERROR} Could not reach or identify the server. Check IP/Port and try again.", ephemeral=True)
             return
-        embed, file, view = await self.cog.generate_response(interaction.guild, detected_type, ip, port, interaction.user.id)
-        sent_message = await interaction.channel.send(embed=embed, file=file, view=view)
-        await self.cog.save_status_message(interaction.guild.id, interaction.user.id, interaction.channel.id, sent_message.id, detected_type, ip, port)
-        await interaction.followup.send(f"{EMOJI_SUCCESS} Auto-updating status for `{ip}` set up!", ephemeral=True)
+        try:
+            embed, file, view = await self.cog.generate_response(
+                interaction.guild, detected_type, ip, port, interaction.user.id
+            )
+            sent_message = await interaction.channel.send(embed=embed, file=file, view=view)
+        except discord.Forbidden:
+            await interaction.followup.send(
+                f"{EMOJI_ERROR} I can't post here — give me **Send Messages** and "
+                f"**Attach Files** in this channel, then run `/minecraft setup` again.",
+                ephemeral=True,
+            )
+            return
+        except discord.HTTPException as error:
+            await interaction.followup.send(
+                f"{EMOJI_ERROR} Discord rejected the status panel (`{type(error).__name__}`). Try again.",
+                ephemeral=True,
+            )
+            return
+
+        await self.cog.save_status_message(
+            interaction.guild.id, interaction.user.id, interaction.channel.id,
+            sent_message.id, detected_type, ip, port,
+        )
+        await interaction.followup.send(
+            f"{EMOJI_SUCCESS} Auto-updating status for `{ip}` set up!", ephemeral=True
+        )
 
 class MinecraftView(ui.View):
     def __init__(self, bot, server_type, ip, port, user_id):
@@ -83,8 +105,21 @@ class MinecraftView(ui.View):
             return await interaction.response.send_message(f"{EMOJI_CLOCK} On cooldown. Wait `{REFRESH_COOLDOWN_SECONDS}` seconds.", ephemeral=True)
         await interaction.response.defer(ephemeral=True)
         cog = self.bot.get_cog("Minecraft")
-        embed, file, view = await cog.generate_response(interaction.guild, self.server_type, self.ip, self.port, self.user_id)
-        await interaction.message.edit(embed=embed, attachments=[file] if file else [], view=view)
+        try:
+            embed, file, view = await cog.generate_response(interaction.guild, self.server_type, self.ip, self.port, self.user_id)
+            await interaction.message.edit(embed=embed, attachments=[file] if file else [], view=view)
+        except discord.Forbidden:
+            await interaction.followup.send(
+                f"{EMOJI_ERROR} I lost access to this channel — give me **Manage Messages** here.",
+                ephemeral=True,
+            )
+            return
+        except discord.HTTPException as error:
+            await interaction.followup.send(
+                f"{EMOJI_ERROR} Refresh failed (`{type(error).__name__}`). Try again.",
+                ephemeral=True,
+            )
+            return
         await interaction.followup.send(f"{EMOJI_SUCCESS} Status refreshed.", ephemeral=True)
         self.last_refresh = now
 

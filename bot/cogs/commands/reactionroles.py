@@ -12,12 +12,14 @@ from utils.emoji import CROSS, TICK
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord import app_commands
+import os
 import sqlite3
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db = "rr.db"
+        self.db = "db/rr.db"
+        os.makedirs("db", exist_ok=True)
         self._create_table()
 
     def _create_table(self):

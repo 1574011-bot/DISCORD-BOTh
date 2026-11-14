@@ -717,7 +717,7 @@ async def patch_guild_tracking(guild_id: int, data: TrackingUpdate):
 @router.get("/{guild_id}/j2c", response_model=J2CConfig, summary="Get J2C config")
 async def get_guild_j2c(guild_id: int):
     import aiosqlite
-    async with aiosqlite.connect("j2c_data.db") as db:
+    async with aiosqlite.connect("db/j2c_data.db") as db:
         # Ensure table exists
         await db.execute("""
             CREATE TABLE IF NOT EXISTS guild_setup (
@@ -758,7 +758,7 @@ async def patch_guild_j2c(guild_id: int, data: J2CUpdate, bot: "zyrox" = Depends
     ctrl_ch = to_id(data.control_channel_id)
     cat_ch = to_id(data.category_id)
     
-    async with aiosqlite.connect("j2c_data.db") as db:
+    async with aiosqlite.connect("db/j2c_data.db") as db:
         await db.execute("""
             CREATE TABLE IF NOT EXISTS guild_setup (
                 guild_id INTEGER PRIMARY KEY,
@@ -1226,7 +1226,7 @@ async def get_guild_invites(guild_id: int):
 
 @router.get("/{guild_id}/reactionroles", response_model=RRConfig, summary="Get Reaction Roles config")
 async def get_guild_rr(guild_id: int):
-    db = await db_manager.get_connection("rr.db")
+    db = await db_manager.get_connection("db/rr.db")
     await db.execute("""
         CREATE TABLE IF NOT EXISTS reaction_roles (
             guild_id INTEGER,
@@ -1262,7 +1262,7 @@ async def get_guild_rr(guild_id: int):
 
 @router.patch("/{guild_id}/reactionroles", summary="Update Reaction Roles config")
 async def patch_guild_rr(guild_id: int, data: RRUpdate):
-    db = await db_manager.get_connection("rr.db")
+    db = await db_manager.get_connection("db/rr.db")
     await db.execute("""
         CREATE TABLE IF NOT EXISTS reaction_roles (
             guild_id INTEGER,

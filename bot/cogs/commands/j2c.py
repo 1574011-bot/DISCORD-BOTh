@@ -13,6 +13,7 @@ from discord import ui, SelectOption
 from discord.ui import LayoutView, TextDisplay, Separator, ActionRow
 import aiosqlite
 import asyncio
+import os
 from typing import Dict, List, Optional
 from utils.cv2 import CV2, build_container
 
@@ -22,7 +23,8 @@ class JoinToCreate(commands.Cog):
         self.private_channels: Dict[int, Dict] = {}
         self.category_name = "J2C"
         self.setup_data: Dict[int, Dict] = {}
-        self.db_path = "j2c_data.db"
+        self.db_path = "db/j2c_data.db"
+        os.makedirs("db", exist_ok=True)
         self.blocked_users: Dict[int, List[int]] = {}  # {vc_id: [user_ids]}
         self.creating_vc = set()
 

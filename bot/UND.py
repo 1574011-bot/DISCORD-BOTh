@@ -339,25 +339,46 @@ from utils.tunnel import start_tunnel
 start_tunnel()
 
 # --- Main Bot Execution ---
+def _log_crash(text: str) -> None:
+    try:
+        os.makedirs("logs", exist_ok=True)
+        with open("logs/crash.log", "a", encoding="utf-8") as fh:
+            fh.write(f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}]\n{text}\n\n")
+    except Exception:
+        pass
+
+
 async def main():
-    async with client:
-        os.system("clear")
-        await client.load_extension("jishaku")
-        
-        max_retries = 5
-        for attempt in range(max_retries):
-            try:
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            async with client:
+                if attempt == 1:
+                    os.system("clear")
+                    await client.load_extension("jishaku")
                 await client.start(TOKEN)
-                break
-            except discord.HTTPException as e:
-                if e.status == 429: # Rate limited
-                    wait_time = min((2 ** attempt) + random.random(), 60)
-                    print(f"Rate limited. Retrying in {wait_time:.2f} seconds...")
-                    await asyncio.sleep(wait_time)
-                else:
-                    raise
-        else:
-            raise Exception("Bot failed to start after multiple retries due to rate limiting.")
+            # start() only returns when the bot was closed on purpose
+            return
+        except (KeyboardInterrupt, SystemExit):
+            return
+        except Exception as error:
+            import traceback as _tb
+            _log_crash(_tb.format_exc())
+            wait_time = min(5 * attempt, 60)
+            print(f"\033[31m◈ Crashed ({type(error).__name__}: {error}) — restarting in {wait_time}s\033[0m")
+            traceback.print_exc()
+            await asyncio.sleep(wait_time)
+
 
 if __name__ == "__main__":
+    import datetime
+    import traceback
+    import faulthandler
+    try:
+        os.makedirs("logs", exist_ok=True)
+        _crash_file = open("logs/crash.log", "a", encoding="utf-8")
+        faulthandler.enable(file=_crash_file)
+    except Exception:
+        pass
     asyncio.run(main())

@@ -87,14 +87,32 @@ class zyrox(commands.AutoShardedBot):
         # Without this every slash-command error is silent and Discord only
         # shows "The application did not respond".
         self.tree.on_error = self.on_app_command_error
-        await self.load_extensions()
-        self.status_task.start()
+        # setup_hook runs again after every reconnect/crash-restart — don't load
+        # the same extensions twice (discord.py raises ExtensionAlreadyLoaded).
+        if not getattr(self, "_und_loaded", False):
+            self._und_loaded = True
+            await self.load_extensions()
+        if not self.status_task.is_running():
+            self.status_task.start()
 
     # ── error handling ────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _log_command_error(kind: str, name: str, user, error: BaseException) -> None:
+        try:
+            import os, datetime
+            os.makedirs("logs", exist_ok=True)
+            with open("logs/commands.log", "a", encoding="utf-8") as fh:
+                fh.write(f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}] {kind} {name} by {user}\n")
+                traceback.print_exception(type(error), error, error.__traceback__, file=fh)
+                fh.write("\n")
+        except Exception:
+            pass
 
     async def on_app_command_error(self, interaction: discord.Interaction, error: Exception) -> None:
         """Answer /app commands instead of failing silently."""
         original = getattr(error, "original", error)
+        self._log_command_error("APP", getattr(interaction.command, "qualified_name", "?"), interaction.user, original)
         if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
             return  # interaction expired (slow gateway) — nothing left to answer
         traceback.print_exception(type(original), original, original.__traceback__)
@@ -135,6 +153,7 @@ class zyrox(commands.AutoShardedBot):
         if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
             return  # interaction expired (slow gateway) — nothing left to answer
         traceback.print_exception(type(original), original, original.__traceback__)
+        self._log_command_error("CMD", getattr(ctx.command, "qualified_name", "?"), ctx.author, original)
 
         if isinstance(original, commands.CommandOnCooldown):
             text = f"⏳ Slow down — try again in **{original.retry_after:.1f}s**."
@@ -154,6 +173,24 @@ class zyrox(commands.AutoShardedBot):
         try:
             await ctx.send(embed=discord.Embed(description=text, color=0xFF0000))
         except discord.HTTPException:
+            pass
+
+    async def on_command(self, ctx: Context) -> None:
+        try:
+            import os, datetime
+            os.makedirs("logs", exist_ok=True)
+            with open("logs/commands.log", "a", encoding="utf-8") as fh:
+                fh.write(f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}] RUN {ctx.command.qualified_name} by {ctx.author}\n")
+        except Exception:
+            pass
+
+    async def on_app_command_completion(self, interaction: discord.Interaction, command) -> None:
+        try:
+            import os, datetime
+            os.makedirs("logs", exist_ok=True)
+            with open("logs/commands.log", "a", encoding="utf-8") as fh:
+                fh.write(f"[{datetime.datetime.now():%Y-%m-%d %H:%M:%S}] RUN /{command.qualified_name} by {interaction.user}\n")
+        except Exception:
             pass
 
     async def load_extensions(self):
@@ -192,8 +229,12 @@ class zyrox(commands.AutoShardedBot):
 
         current = self.status_list[self.status_index % len(self.status_list)]
         # This task only changes the activity, not the online status (dnd, idle, etc.)
-        await self.change_presence(activity=discord.Activity(type=current[0], name=current[1]))
-        self.status_index += 1
+        try:
+            await self.change_presence(activity=discord.Activity(type=current[0], name=current[1]))
+            self.status_index += 1
+        except (discord.HTTPException, ConnectionError, asyncio.TimeoutError):
+            # Gateway is reconnecting — try again on the next tick instead of spamming.
+            return
 
     async def send_raw(self, channel_id: int, content: str, **kwargs) -> typing.Optional[discord.Message]:
         await self.http.send_message(channel_id, content, **kwargs)

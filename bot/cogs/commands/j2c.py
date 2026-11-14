@@ -382,13 +382,13 @@ class ControlPanelView(LayoutView):
         b_privacy.callback = self.toggle_privacy
         b_thread = ui.Button(label="THREAD", style=discord.ButtonStyle.blurple, custom_id="j2c:thread", emoji="💬")
         b_thread.callback = self.create_thread
-        b_untrust = ui.Button(label="UNTRUST", style=discord.ButtonStyle.green, custom_id="j2c:untrust", emoji="❌")
+        b_untrust = ui.Button(label="UNTRUST", style=discord.ButtonStyle.danger, custom_id="j2c:untrust", emoji="❌")
         b_untrust.callback = self.untrust
-        b_invite = ui.Button(label="INVITE", style=discord.ButtonStyle.green, custom_id="j2c:invite", emoji="✉️")
+        b_invite = ui.Button(label="INVITE", style=discord.ButtonStyle.danger, custom_id="j2c:invite", emoji="✉️")
         b_invite.callback = self.invite_user
-        b_kick = ui.Button(label="KICK", style=discord.ButtonStyle.green, custom_id="j2c:kick", emoji="👢")
+        b_kick = ui.Button(label="KICK", style=discord.ButtonStyle.danger, custom_id="j2c:kick", emoji="👢")
         b_kick.callback = self.kick_user
-        b_region = ui.Button(label="REGION", style=discord.ButtonStyle.green, custom_id="j2c:region", emoji="🌍")
+        b_region = ui.Button(label="REGION", style=discord.ButtonStyle.danger, custom_id="j2c:region", emoji="🌍")
         b_region.callback = self.set_region
         b_unblock = ui.Button(label="UNBLOCK", style=discord.ButtonStyle.red, custom_id="j2c:unblock", emoji="🔓")
         b_unblock.callback = self.unblock

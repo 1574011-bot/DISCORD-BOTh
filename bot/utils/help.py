@@ -69,11 +69,11 @@ class View(LayoutView):
         is_first = self.index == 0
         is_last = self.index >= len(self.pages) - 1
 
-        homeB = discord.ui.Button(label="", emoji=REWIND, style=discord.ButtonStyle.secondary, disabled=is_first)
-        backB = discord.ui.Button(label="", emoji=PREVIOUS, style=discord.ButtonStyle.secondary, disabled=is_first)
+        homeB = discord.ui.Button(label="", emoji=REWIND, style=discord.ButtonStyle.danger, disabled=is_first)
+        backB = discord.ui.Button(label="", emoji=PREVIOUS, style=discord.ButtonStyle.danger, disabled=is_first)
         quitB = discord.ui.Button(label="", emoji=DELETE, style=discord.ButtonStyle.danger)
-        nextB = discord.ui.Button(label="", emoji=NEXT, style=discord.ButtonStyle.secondary, disabled=is_last)
-        lastB = discord.ui.Button(label="", emoji=FORWARD, style=discord.ButtonStyle.secondary, disabled=is_last)
+        nextB = discord.ui.Button(label="", emoji=NEXT, style=discord.ButtonStyle.danger, disabled=is_last)
+        lastB = discord.ui.Button(label="", emoji=FORWARD, style=discord.ButtonStyle.danger, disabled=is_last)
 
         homeB.callback = self._home_cb
         backB.callback = self._back_cb

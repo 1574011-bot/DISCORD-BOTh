@@ -191,7 +191,7 @@ class Antinuke(commands.Cog):
           f"{TICK} **Auto Recovery**"
         )
 
-        punishment_btn = Button(label="Show Punishment Type", style=discord.ButtonStyle.secondary)
+        punishment_btn = Button(label="Show Punishment Type", style=discord.ButtonStyle.danger)
         punishment_btn.callback = self._show_punishment
 
         result_view = LayoutView(timeout=None)

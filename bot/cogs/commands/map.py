@@ -33,26 +33,26 @@ class MapView(LayoutView):
         
         self.update_map()
 
-        b_left = ui.Button(label="", emoji="⬅️", style=ButtonStyle.secondary)
+        b_left = ui.Button(label="", emoji="⬅️", style=ButtonStyle.danger)
         b_left.callback = self.move_left
-        b_up = ui.Button(label="", emoji="⬆️", style=ButtonStyle.secondary)
+        b_up = ui.Button(label="", emoji="⬆️", style=ButtonStyle.danger)
         b_up.callback = self.move_up
         b_delete = ui.Button(label="", emoji=DELETE, style=ButtonStyle.danger)
         b_delete.callback = self.delete_embed
-        b_down = ui.Button(label="", emoji="⬇️", style=ButtonStyle.secondary)
+        b_down = ui.Button(label="", emoji="⬇️", style=ButtonStyle.danger)
         b_down.callback = self.move_down
-        b_right = ui.Button(label="", emoji="➡️", style=ButtonStyle.secondary)
+        b_right = ui.Button(label="", emoji="➡️", style=ButtonStyle.danger)
         b_right.callback = self.move_right
 
         self.add_item(ActionRow(b_left, b_up, b_delete, b_down, b_right))
 
-        b_zin = ui.Button(label="Zoom In", style=ButtonStyle.primary)
+        b_zin = ui.Button(label="Zoom In", style=ButtonStyle.danger)
         b_zin.callback = self.zoom_in
-        b_zout = ui.Button(label="Zoom Out", style=ButtonStyle.primary)
+        b_zout = ui.Button(label="Zoom Out", style=ButtonStyle.danger)
         b_zout.callback = self.zoom_out
-        b_coords = ui.Button(label="Enter Coordinates", style=ButtonStyle.primary)
+        b_coords = ui.Button(label="Enter Coordinates", style=ButtonStyle.danger)
         b_coords.callback = self.enter_coordinates
-        b_addr = ui.Button(label="Enter Address", style=ButtonStyle.success)
+        b_addr = ui.Button(label="Enter Address", style=ButtonStyle.danger)
         b_addr.callback = self.enter_address
 
         self.add_item(ActionRow(b_zin, b_zout, b_coords, b_addr))

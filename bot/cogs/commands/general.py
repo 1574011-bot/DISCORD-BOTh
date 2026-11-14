@@ -61,7 +61,7 @@ class AvatarView(View):
       return False
     return True
 
-  @discord.ui.button(label='Server Avatar', style=discord.ButtonStyle.success, custom_id='server_avatar_button')
+  @discord.ui.button(label='Server Avatar', style=discord.ButtonStyle.danger, custom_id='server_avatar_button')
   async def server_avatar(self, interaction: discord.Interaction, button: Button):
     if not self.member.guild_avatar:
       await interaction.response.send_message(
@@ -73,7 +73,7 @@ class AvatarView(View):
       embed.set_image(url=self.member.guild_avatar.url)
       await interaction.response.edit_message(embed=embed)
 
-  @discord.ui.button(label='User Banner', style=discord.ButtonStyle.success, custom_id='banner_button')
+  @discord.ui.button(label='User Banner', style=discord.ButtonStyle.danger, custom_id='banner_button')
   async def banner(self, interaction: discord.Interaction, button: Button):
     if not self.banner_url:
       await interaction.response.send_message(

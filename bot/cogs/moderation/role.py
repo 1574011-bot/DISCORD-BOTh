@@ -276,7 +276,7 @@ class Role(commands.Cog):
   async def role_humans(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -359,7 +359,7 @@ class Role(commands.Cog):
   async def role_bots(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -442,7 +442,7 @@ class Role(commands.Cog):
   async def role_unverified(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -520,7 +520,7 @@ class Role(commands.Cog):
   async def role_all(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -615,7 +615,7 @@ class Role(commands.Cog):
   async def rrole_humans(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -697,7 +697,7 @@ class Role(commands.Cog):
   async def rrole_bots(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -779,7 +779,7 @@ class Role(commands.Cog):
   async def rrole_all(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Confirm",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="Cancel",
                          style=discord.ButtonStyle.red,
@@ -859,7 +859,7 @@ class Role(commands.Cog):
   async def rrole_unverified(self, ctx, *, role: discord.Role):
     if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
         button = Button(label="Yes",
-                        style=discord.ButtonStyle.green,
+                        style=discord.ButtonStyle.danger,
                         emoji=f"{TICK}>")
         button1 = Button(label="No",
                          style=discord.ButtonStyle.red,

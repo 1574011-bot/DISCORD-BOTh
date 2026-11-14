@@ -207,7 +207,7 @@ class ReviewView(discord.ui.View):
         super().__init__(timeout=None)
         self.cog = cog
 
-    @discord.ui.button(label="Approve", emoji="✅", style=discord.ButtonStyle.success, custom_id="smp_app_approve")
+    @discord.ui.button(label="Approve", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_app_approve")
     async def approve(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "approved")
 
@@ -215,7 +215,7 @@ class ReviewView(discord.ui.View):
     async def deny(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "denied")
 
-    @discord.ui.button(label="Mark whitelisted", emoji="✅", style=discord.ButtonStyle.secondary, custom_id="smp_app_added")
+    @discord.ui.button(label="Mark whitelisted", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_app_added")
     async def added(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "added")
 
@@ -225,7 +225,7 @@ class LinkReviewView(discord.ui.View):
         super().__init__(timeout=None)
         self.cog = cog
 
-    @discord.ui.button(label="Approve link", emoji="✅", style=discord.ButtonStyle.success, custom_id="smp_link_approve")
+    @discord.ui.button(label="Approve link", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_link_approve")
     async def approve(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_link(interaction, interaction.message.id, "approved")
 
@@ -437,11 +437,11 @@ class SMP(commands.Cog):
         await interaction.response.defer(ephemeral=True, thinking=True)
         guild = interaction.guild
         config = await get_config(guild.id)
-        review_id = (config or {}).get("review_channel_id")
-        if not config or not review_id:
+        if not config or not config.get("host"):
             return await interaction.followup.send(
                 "❌ SMP is not configured yet. Ask staff to run `/smp setup`.", ephemeral=True
             )
+        review_id = config.get("review_channel_id") or config.get("apply_channel_id")
         if not IGN_PATTERN.match(ign):
             return await interaction.followup.send("❌ That is not a valid Minecraft username.", ephemeral=True)
 
@@ -487,10 +487,18 @@ class SMP(commands.Cog):
         embed.timestamp = datetime.now(timezone.utc)
 
         try:
-            review_channel = guild.get_channel(review_id) or await guild.fetch_channel(review_id)
+            if review_id:
+                review_channel = guild.get_channel(review_id) or await guild.fetch_channel(review_id)
+            else:
+                # No review channel configured: keep the request in the channel
+                # the member used so staff can still approve it.
+                review_channel = interaction.channel
             message = await review_channel.send(embed=embed, view=LinkReviewView(self))
         except (discord.Forbidden, discord.HTTPException, AttributeError):
-            return await interaction.followup.send("❌ I cannot post in the review channel.", ephemeral=True)
+            return await interaction.followup.send(
+                "❌ I cannot post the link request here. Staff: add **review_channel** to `/smp setup`.",
+                ephemeral=True,
+            )
 
         async with aiosqlite.connect(DB_PATH) as db:
             await db.execute(
@@ -668,7 +676,7 @@ class SMP(commands.Cog):
             embed=discord.Embed(
                 title="✅ SMP configured",
                 description=f"**Host:** `{fields['host']}`\n**Status:** {reachable}",
-                color=COLOR_GREEN,
+                color=COLOR_RED,
             )
         )
 

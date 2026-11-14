@@ -94,7 +94,7 @@ class EmbedBuilder(ui.LayoutView):
         self.container.add_item(ui.ActionRow(select))
 
         # Buttons
-        send_btn = ui.Button(label="Send Embed", emoji=TICK, style=discord.ButtonStyle.success)
+        send_btn = ui.Button(label="Send Embed", emoji=TICK, style=discord.ButtonStyle.danger)
         send_btn.callback = self._send_callback
         cancel_btn = ui.Button(label="Cancel Setup", emoji=CROSS, style=discord.ButtonStyle.danger)
         cancel_btn.callback = self._cancel_callback

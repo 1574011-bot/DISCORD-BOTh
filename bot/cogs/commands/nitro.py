@@ -37,7 +37,7 @@ class Nitro(commands.Cog):
         )
 
         claim_button = Button(
-            style=discord.ButtonStyle.primary,
+            style=discord.ButtonStyle.danger,
             label="Click me!",
             url="https://discord.gg/und",
             disabled=False,

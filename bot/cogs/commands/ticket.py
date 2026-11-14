@@ -121,13 +121,13 @@ class EmbedEditorView(discord.ui.View):
             return msg.content
         except: return None
 
-    @discord.ui.button(label="Title", style=discord.ButtonStyle.green, row=0)
+    @discord.ui.button(label="Title", style=discord.ButtonStyle.danger, row=0)
     async def edit_title(self, inter, button):
         if title := await self._prompt(inter, "Enter new title:"):
             self.embed_data["title"] = title
             await self.message.edit(embed=self._create_preview_embed())
 
-    @discord.ui.button(label="Description", style=discord.ButtonStyle.green, row=0)
+    @discord.ui.button(label="Description", style=discord.ButtonStyle.danger, row=0)
     async def edit_desc(self, inter, button):
         if desc := await self._prompt(inter, "Enter new description:"):
             self.embed_data["description"] = desc
@@ -145,7 +145,7 @@ class EmbedEditorView(discord.ui.View):
             self.embed_data["thumbnail"] = {"url": url} if url.lower() != 'none' else {}
             await self.message.edit(embed=self._create_preview_embed())
 
-    @discord.ui.button(label="Submit & Continue", style=discord.ButtonStyle.primary, row=2)
+    @discord.ui.button(label="Submit & Continue", style=discord.ButtonStyle.danger, row=2)
     async def submit(self, inter, button):
         await inter.response.defer()
         for item in self.children: item.disabled = True
@@ -163,10 +163,10 @@ class CategoryConfigView(discord.ui.View):
 
     def _setup_buttons(self):
         panel_type = self.cog.db.fetchone("SELECT panel_type FROM guild_configs WHERE guild_id=?", (self.ctx.guild.id,))['panel_type']
-        self.add_item(discord.ui.Button(label=f"Add Category", style=discord.ButtonStyle.success, custom_id="add_cat"))
+        self.add_item(discord.ui.Button(label=f"Add Category", style=discord.ButtonStyle.danger, custom_id="add_cat"))
         self.remove_select = discord.ui.Select(placeholder="Select a category to remove...", custom_id="remove_cat")
         self.add_item(self.remove_select)
-        self.add_item(discord.ui.Button(label="Finish Setup", style=discord.ButtonStyle.primary, custom_id="finish_setup", row=2))
+        self.add_item(discord.ui.Button(label="Finish Setup", style=discord.ButtonStyle.danger, custom_id="finish_setup", row=2))
 
     async def start(self, interaction):
         self._update_remove_select()
@@ -225,7 +225,7 @@ class CategoryConfigView(discord.ui.View):
             "name": cat_name, 
             "emoji": emoji,
             "notified_roles": ",".join(map(str, role_ids)) if role_ids else None, 
-            "button_style": discord.ButtonStyle.secondary.value
+            "button_style": discord.ButtonStyle.danger.value
         })
         self._update_remove_select()
         await self.message.edit(embed=self._update_embed(), view=self)
@@ -384,7 +384,7 @@ class TicketActionsView(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Lock", emoji=LOCK_EMOJI, custom_id="t_lock", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Lock", emoji=LOCK_EMOJI, custom_id="t_lock", style=discord.ButtonStyle.danger)
     async def b_lock(self, i, b):
         t = self.cog.db.fetchone("SELECT * FROM open_tickets WHERE channel_id=?", (self.ch_id,))
         if t['is_locked']: return await i.response.send_message("This ticket is already locked.", ephemeral=True)
@@ -394,7 +394,7 @@ class TicketActionsView(discord.ui.View):
         await i.response.send_message(f"{LOCK_EMOJI} Ticket locked by {i.user.mention}.")
         await log_ticket_action(self.cog.db, i.guild, i.user, "Locked", f"{i.channel.mention}")
 
-    @discord.ui.button(label="Unlock", emoji=UNLOCK_EMOJI, custom_id="t_unlock", style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label="Unlock", emoji=UNLOCK_EMOJI, custom_id="t_unlock", style=discord.ButtonStyle.danger)
     async def b_unlock(self, i, b):
         t = self.cog.db.fetchone("SELECT * FROM open_tickets WHERE channel_id=?", (self.ch_id,))
         if not t['is_locked']: return await i.response.send_message("This ticket is already unlocked.", ephemeral=True)
@@ -404,7 +404,7 @@ class TicketActionsView(discord.ui.View):
         await i.response.send_message(f"{UNLOCK_EMOJI} Ticket unlocked by {i.user.mention}.")
         await log_ticket_action(self.cog.db, i.guild, i.user, "Unlocked", f"{i.channel.mention}")
 
-    @discord.ui.button(label="Claim", emoji=CLAIM_EMOJI, custom_id="t_claim", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Claim", emoji=CLAIM_EMOJI, custom_id="t_claim", style=discord.ButtonStyle.danger)
     async def b_claim(self, i, b):
         t = self.cog.db.fetchone("SELECT * FROM open_tickets WHERE channel_id=?", (self.ch_id,))
         if t['is_claimed']: return await i.response.send_message(f"This ticket is already claimed by <@{t['claimed_by_id']}>.", ephemeral=True)
@@ -460,7 +460,7 @@ class ClosedTicketActionsView(discord.ui.View):
             return False
         return True
 
-    @discord.ui.button(label="Reopen", emoji=REOPEN_EMOJI, style=discord.ButtonStyle.success)
+    @discord.ui.button(label="Reopen", emoji=REOPEN_EMOJI, style=discord.ButtonStyle.danger)
     async def b_reopen(self, i: discord.Interaction, button: discord.ui.Button):
         await i.response.defer(ephemeral=True)
         t = self.cog.db.fetchone("SELECT * FROM open_tickets WHERE channel_id=?", (self.ch_id,))
@@ -482,7 +482,7 @@ class ClosedTicketActionsView(discord.ui.View):
         await log_ticket_action(self.cog.db, i.guild, i.user, "Reopened", f"{i.channel.mention}")
         self.stop()
         
-    @discord.ui.button(label="Transcript", emoji=TRANSCRIPT_EMOJI, style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="Transcript", emoji=TRANSCRIPT_EMOJI, style=discord.ButtonStyle.danger)
     async def b_transcript(self, i, b): await self._generate_transcript(i, False)
 
     @discord.ui.button(label="Delete", emoji=DELETE_EMOJI, style=discord.ButtonStyle.danger)

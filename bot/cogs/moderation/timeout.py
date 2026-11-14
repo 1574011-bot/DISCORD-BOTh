@@ -35,12 +35,12 @@ from utils.Tools import *
        # if self.message:
         #    await self.message.edit(view=self)
 
-   # @ui.button(label="Unmute", style=discord.ButtonStyle.success)
+   # @ui.button(label="Unmute", style=discord.ButtonStyle.danger)
     #async def unmute(self, interaction: discord.Interaction, button: discord.ui.Button):
       #  modal = ReasonModal(user=self.user, author=self.author, view=self)
        # await interaction.response.send_modal(modal)
 #
-   # @ui.button(style=discord.ButtonStyle.gray, emoji=DELETE)
+   # @ui.button(style=discord.ButtonStyle.danger, emoji=DELETE)
   #  async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
       #  await interaction.message.delete()
 #
@@ -66,12 +66,12 @@ from utils.Tools import *
          #   except Exception:
            #     pass
 
- #   @ui.button(label="Unmute", style=discord.ButtonStyle.success)
+ #   @ui.button(label="Unmute", style=discord.ButtonStyle.danger)
   #  async def unmute(self, interaction: discord.Interaction, button: discord.ui.Button):
      #   modal = ReasonModal(user=self.user, author=self.author, view=self)
      #   await interaction.response.send_modal(modal)
 
-   # @ui.button(style=discord.ButtonStyle.gray, emoji=DELETE)
+   # @ui.button(style=discord.ButtonStyle.danger, emoji=DELETE)
    # async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
      #   await interaction.message.delete()
 #

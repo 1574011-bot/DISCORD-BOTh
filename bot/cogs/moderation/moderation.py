@@ -132,7 +132,7 @@ class Moderation(commands.Cog):
   async def unlockall(self, ctx):
       if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
           button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
           button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,
@@ -217,7 +217,7 @@ class Moderation(commands.Cog):
   async def lockall(self, ctx):
       if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
           button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
           button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,
@@ -369,7 +369,7 @@ class Moderation(commands.Cog):
   async def hideall(self, ctx):
       if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
           button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
           button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,
@@ -447,7 +447,7 @@ class Moderation(commands.Cog):
   async def unhideall(self, ctx):
       if ctx.author == ctx.guild.owner or ctx.author.top_role.position > ctx.guild.me.top_role.position:
           button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
           button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,
@@ -682,7 +682,7 @@ class Moderation(commands.Cog):
   @commands.has_permissions(manage_channels=True)
   async def _nuke(self, ctx: commands.Context):
     button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
     button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,
@@ -983,7 +983,7 @@ class Moderation(commands.Cog):
   @commands.has_permissions(ban_members=True)
   async def unbanall(self, ctx):
     button = Button(label="Confirm",
-                    style=discord.ButtonStyle.green,
+                    style=discord.ButtonStyle.danger,
                     emoji=f"{TICK}>")
     button1 = Button(label="Cancel",
                      style=discord.ButtonStyle.red,

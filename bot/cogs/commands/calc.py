@@ -20,43 +20,43 @@ class CalculatorView(View):
         self.message = None
 
     # Button interactions 
-    @button(label="1", style=discord.ButtonStyle.grey, row=0)
+    @button(label="1", style=discord.ButtonStyle.danger, row=0)
     async def one(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "1")
 
-    @button(label="2", style=discord.ButtonStyle.grey, row=0)
+    @button(label="2", style=discord.ButtonStyle.danger, row=0)
     async def two(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "2")
 
-    @button(label="3", style=discord.ButtonStyle.grey, row=0)
+    @button(label="3", style=discord.ButtonStyle.danger, row=0)
     async def three(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "3")
 
-    @button(label="4", style=discord.ButtonStyle.grey, row=1)
+    @button(label="4", style=discord.ButtonStyle.danger, row=1)
     async def four(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "4")
 
-    @button(label="5", style=discord.ButtonStyle.grey, row=1)
+    @button(label="5", style=discord.ButtonStyle.danger, row=1)
     async def five(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "5")
 
-    @button(label="6", style=discord.ButtonStyle.grey, row=1)
+    @button(label="6", style=discord.ButtonStyle.danger, row=1)
     async def six(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "6")
 
-    @button(label="7", style=discord.ButtonStyle.grey, row=2)
+    @button(label="7", style=discord.ButtonStyle.danger, row=2)
     async def seven(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "7")
 
-    @button(label="8", style=discord.ButtonStyle.grey, row=2)
+    @button(label="8", style=discord.ButtonStyle.danger, row=2)
     async def eight(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "8")
 
-    @button(label="9", style=discord.ButtonStyle.grey, row=2)
+    @button(label="9", style=discord.ButtonStyle.danger, row=2)
     async def nine(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "9")
 
-    @button(label="0", style=discord.ButtonStyle.grey, row=3)
+    @button(label="0", style=discord.ButtonStyle.danger, row=3)
     async def zero(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "0")
 
@@ -76,7 +76,7 @@ class CalculatorView(View):
     async def divide(self, interaction: discord.Interaction, button: Button):
         await self.update_value(interaction, "/")
 
-    @button(label="=", style=discord.ButtonStyle.green, row=4)
+    @button(label="=", style=discord.ButtonStyle.danger, row=4)
     async def equals(self, interaction: discord.Interaction, button: Button):
         if interaction.user != self.author:
             return await interaction.response.send_message(

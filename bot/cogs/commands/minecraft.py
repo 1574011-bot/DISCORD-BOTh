@@ -96,7 +96,7 @@ class MinecraftView(ui.View):
         self.bot, self.server_type, self.ip, self.port, self.user_id = bot, server_type, ip, port, user_id
         self.last_refresh = None
 
-    @ui.button(label="Refresh", style=discord.ButtonStyle.secondary, custom_id="refresh_button", emoji=EMOJI_REFRESH)
+    @ui.button(label="Refresh", style=discord.ButtonStyle.danger, custom_id="refresh_button", emoji=EMOJI_REFRESH)
     async def refresh_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.id != self.user_id:
             return await interaction.response.send_message(f"{EMOJI_ERROR} You can't refresh this panel.", ephemeral=True)

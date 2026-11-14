@@ -39,7 +39,7 @@ class Global(commands.Cog):
             description=f"The user is in **{mutual_count}** mutual guilds with the bot.\n\nGlobal Ban Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -65,7 +65,7 @@ class Global(commands.Cog):
             )
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             new_view = View()
             new_view.add_item(success_button)
@@ -115,7 +115,7 @@ class Global(commands.Cog):
             description=f"The user is in **{mutual_count}** mutual guilds with the bot.\n\nGlobal Kick Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -141,7 +141,7 @@ class Global(commands.Cog):
             )
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             new_view = View()
             new_view.add_item(success_button)
@@ -191,7 +191,7 @@ class Global(commands.Cog):
             description=f"The user is in **{mutual_count}** mutual guilds with the bot.\n\nGlobal Timeout Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -221,7 +221,7 @@ class Global(commands.Cog):
             )
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             new_view = View()
             new_view.add_item(success_button)
@@ -275,7 +275,7 @@ class Global(commands.Cog):
             description=f"The user is in **{mutual_count}** mutual guilds with the bot.\n\nGlobal Nick Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -303,7 +303,7 @@ class Global(commands.Cog):
             )
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             new_view = View()
             new_view.add_item(success_button)
@@ -354,7 +354,7 @@ class Global(commands.Cog):
             description=f"The user is in **{mutual_count}** mutual guilds with the bot.\n\nGlobal Clearnick Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -382,7 +382,7 @@ class Global(commands.Cog):
             )
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             new_view = View()
             new_view.add_item(success_button)
@@ -439,7 +439,7 @@ class Global(commands.Cog):
             description=f"The user is in {mutual_count} mutual guilds with the bot.\n\nGlobal Freezenick Requestor: {ctx.author.mention}",
             color=0xFF0000
         )
-        yes_button = Button(label="Yes", style=discord.ButtonStyle.green)
+        yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
         no_button = Button(label="No", style=discord.ButtonStyle.red)
         view = View()
         view.add_item(yes_button)
@@ -474,7 +474,7 @@ class Global(commands.Cog):
             embed.add_field(name="Success Count", value=f"{len(success)} Guilds")
             embed.add_field(name="Failure Count", value=f"{len(failure)} Guilds")
 
-            success_button = Button(label="List Successful", style=discord.ButtonStyle.green)
+            success_button = Button(label="List Successful", style=discord.ButtonStyle.danger)
             failure_button = Button(label="List Unsuccessful", style=discord.ButtonStyle.red)
             stop_button = Button(label="Stop Freezing", style=discord.ButtonStyle.red)
             result_view = View()

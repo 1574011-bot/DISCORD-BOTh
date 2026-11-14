@@ -90,8 +90,8 @@ class PlatformSelectView(LayoutView):
 
         platforms = [
             ("YouTube", "ytsearch", discord.ButtonStyle.red),
-            ("JioSaavn", "jssearch", discord.ButtonStyle.green),
-            ("SoundCloud", "scsearch", discord.ButtonStyle.grey),
+            ("JioSaavn", "jssearch", discord.ButtonStyle.danger),
+            ("SoundCloud", "scsearch", discord.ButtonStyle.danger),
         ]
         buttons = []
         for name, source, style in platforms:
@@ -141,7 +141,7 @@ class SearchResultView(LayoutView):
 
         buttons = []
         for i in range(min(5, len(results))):
-            btn = Button(label=str(i + 1), style=discord.ButtonStyle.primary)
+            btn = Button(label=str(i + 1), style=discord.ButtonStyle.danger)
             btn.callback = self.create_callback(i)
             buttons.append(btn)
 
@@ -208,18 +208,18 @@ class MusicControlView(LayoutView):
                 items.append(TextDisplay(bullet_text))
 
         # Row 1 buttons (Main 5 from screenshot with exact styles)
-        btn_pause = Button(emoji=ICONS_PAUSE, label="Pause", style=discord.ButtonStyle.primary)
-        btn_skip = Button(emoji=SKIP, label="Skip", style=discord.ButtonStyle.secondary)
+        btn_pause = Button(emoji=ICONS_PAUSE, label="Pause", style=discord.ButtonStyle.danger)
+        btn_skip = Button(emoji=SKIP, label="Skip", style=discord.ButtonStyle.danger)
         btn_stop = Button(emoji=MUSICSTOP_ICONS, label="Stop", style=discord.ButtonStyle.danger)
-        btn_loop = Button(emoji=ICONLOAD, label="Loop", style=discord.ButtonStyle.secondary)
-        btn_autoplay = Button(emoji=ZUNMUTE, label="Autoplay", style=discord.ButtonStyle.secondary)
+        btn_loop = Button(emoji=ICONLOAD, label="Loop", style=discord.ButtonStyle.danger)
+        btn_autoplay = Button(emoji=ZUNMUTE, label="Autoplay", style=discord.ButtonStyle.danger)
 
         # Row 2 buttons (Remaining controls)
-        btn_prev = Button(emoji=REWIND, style=discord.ButtonStyle.secondary)
-        btn_shuffle = Button(emoji=SHUFFLE, style=discord.ButtonStyle.secondary)
-        btn_rewind = Button(emoji=REWIND_ALT1, style=discord.ButtonStyle.secondary)
-        btn_forward = Button(emoji=FORWARD, style=discord.ButtonStyle.secondary)
-        btn_replay = Button(emoji=ICONS_MUSIC, style=discord.ButtonStyle.secondary)
+        btn_prev = Button(emoji=REWIND, style=discord.ButtonStyle.danger)
+        btn_shuffle = Button(emoji=SHUFFLE, style=discord.ButtonStyle.danger)
+        btn_rewind = Button(emoji=REWIND_ALT1, style=discord.ButtonStyle.danger)
+        btn_forward = Button(emoji=FORWARD, style=discord.ButtonStyle.danger)
+        btn_replay = Button(emoji=ICONS_MUSIC, style=discord.ButtonStyle.danger)
 
         btn_pause.callback = self._cb_pause
         btn_skip.callback = self._cb_skip

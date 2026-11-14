@@ -19,7 +19,7 @@ from utils.Tools import *
 
 class VariableButton(Button):
     def __init__(self, author):
-        super().__init__(label="Variables", style=discord.ButtonStyle.secondary)
+        super().__init__(label="Variables", style=discord.ButtonStyle.danger)
         self.author = author
 
     async def callback(self, interaction: discord.Interaction):
@@ -115,11 +115,11 @@ class Welcomer(commands.Cog):
             elif button.custom_id == "cancel":
                 await interaction.message.delete()
 
-        button_simple = Button(label="Simple", style=discord.ButtonStyle.success, custom_id="simple")
+        button_simple = Button(label="Simple", style=discord.ButtonStyle.danger, custom_id="simple")
         button_simple.callback = lambda interaction: option_callback(interaction, button_simple)
         options_view.add_item(button_simple)
 
-        button_embed = Button(label="Embed", style=discord.ButtonStyle.success, custom_id="embed")
+        button_embed = Button(label="Embed", style=discord.ButtonStyle.danger, custom_id="embed")
         button_embed.callback = lambda interaction: option_callback(interaction, button_embed)
         options_view.add_item(button_embed)
 
@@ -220,16 +220,16 @@ class Welcomer(commands.Cog):
                 return
             await preview_message.delete()
 
-        submit_button = Button(label="Submit", style=discord.ButtonStyle.success)
+        submit_button = Button(label="Submit", style=discord.ButtonStyle.danger)
         submit_button.callback = submit_callback
         setup_view.add_item(submit_button)
 
-        edit_button = Button(label="Edit", style=discord.ButtonStyle.primary)
+        edit_button = Button(label="Edit", style=discord.ButtonStyle.danger)
         edit_button.callback = edit_callback
         setup_view.add_item(edit_button)
         setup_view.add_item(VariableButton(ctx.author))
 
-        cancel_button = Button(emoji=ICONS_PLUS, style=discord.ButtonStyle.secondary)
+        cancel_button = Button(emoji=ICONS_PLUS, style=discord.ButtonStyle.danger)
         cancel_button.callback = cancel_callback
         setup_view.add_item(cancel_button)
 
@@ -399,7 +399,7 @@ class Welcomer(commands.Cog):
                 item.disabled = True
             await preview_message.edit(view=setup_view)
 
-        submit_button = Button(label="Submit", style=discord.ButtonStyle.success)
+        submit_button = Button(label="Submit", style=discord.ButtonStyle.danger)
         submit_button.callback = submit_callback
         setup_view.add_item(submit_button)
         setup_view.add_item(VariableButton(ctx.author))
@@ -442,7 +442,7 @@ class Welcomer(commands.Cog):
         )
 
         yes_button = Button(label="Confirm", style=discord.ButtonStyle.danger)
-        no_button = Button(label="Cancel", style=discord.ButtonStyle.secondary)
+        no_button = Button(label="Cancel", style=discord.ButtonStyle.danger)
 
         async def yes_button_callback(interaction):
             if interaction.user != ctx.author:
@@ -529,8 +529,8 @@ class Welcomer(commands.Cog):
 
             select_menu.callback = select_callback
 
-            next_button = Button(label="Next List of Channels", style=discord.ButtonStyle.secondary, disabled=page >= len(chunks) - 1)
-            previous_button = Button(label="Previous", style=discord.ButtonStyle.secondary, disabled=page <= 0)
+            next_button = Button(label="Next List of Channels", style=discord.ButtonStyle.danger, disabled=page >= len(chunks) - 1)
+            previous_button = Button(label="Previous", style=discord.ButtonStyle.danger, disabled=page <= 0)
 
             async def next_callback(interaction: discord.Interaction):
                 if interaction.user != ctx.author:
@@ -784,7 +784,7 @@ class Welcomer(commands.Cog):
                 description=f"**Response Type:** Simple\n**Message Content:** {welcome_message or 'None'}",
                 color=0xFF0000
             )
-            edit_button = Button(label="Edit", style=discord.ButtonStyle.primary)
+            edit_button = Button(label="Edit", style=discord.ButtonStyle.danger)
             cancel_button = Button(label="Cancel", style=discord.ButtonStyle.danger)
 
             async def cancel_button_callback(interaction):

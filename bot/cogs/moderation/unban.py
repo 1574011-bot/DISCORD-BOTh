@@ -41,7 +41,7 @@ from utils.Tools import *
        # modal = ReasonModal(user=self.user, author=self.author, view=self)
       #  await interaction.response.send_modal(modal)
 
-   # @ui.button(style=discord.ButtonStyle.gray, emoji=DELETE)
+   # @ui.button(style=discord.ButtonStyle.danger, emoji=DELETE)
    # async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
       #  await interaction.message.delete()
 
@@ -69,7 +69,7 @@ from utils.Tools import *
      #   modal = ReasonModal(user=self.user, author=self.author, view=self)
      #   await interaction.response.send_modal(modal)
 
-   # @ui.button(style=discord.ButtonStyle.gray, emoji=DELETE)
+   # @ui.button(style=discord.ButtonStyle.danger, emoji=DELETE)
    # async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
      #   await interaction.message.delete()
 

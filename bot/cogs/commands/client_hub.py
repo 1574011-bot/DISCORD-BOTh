@@ -114,7 +114,7 @@ class ClientButton(discord.ui.Button):
         super().__init__(
             label=label,
             emoji=_safe_emoji(row.get("emoji")),
-            style=discord.ButtonStyle.secondary,
+            style=discord.ButtonStyle.danger,
             custom_id=f"und:cl:{guild_id}:{row['id']}",
         )
         self.cog = cog
@@ -129,7 +129,7 @@ class PageButton(discord.ui.Button):
     def __init__(self, cog: "ClientHub", guild_id: int, page: int, emoji: str, disabled: bool = False):
         super().__init__(
             emoji=emoji,
-            style=discord.ButtonStyle.primary,
+            style=discord.ButtonStyle.danger,
             custom_id=f"und:clp:{guild_id}:{page}",
             disabled=disabled,
         )

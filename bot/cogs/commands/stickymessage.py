@@ -229,11 +229,11 @@ class StickySetupView(AuthorOnlyView):
         super().__init__(ctx)
         self.channel = channel
 
-    @discord.ui.button(label='Plain Text', style=discord.ButtonStyle.primary, emoji='📝')
+    @discord.ui.button(label='Plain Text', style=discord.ButtonStyle.danger, emoji='📝')
     async def plain_text(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(PlainTextModal(self.ctx, self.channel))
 
-    @discord.ui.button(label='Embed', style=discord.ButtonStyle.secondary, emoji='📋')
+    @discord.ui.button(label='Embed', style=discord.ButtonStyle.danger, emoji='📋')
     async def embed_message(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EmbedModal(self.ctx, self.channel))
 
@@ -307,14 +307,14 @@ class StickyEditView(AuthorOnlyView):
         self.channel = channel
         self.sticky_data = sticky_data
 
-    @discord.ui.button(label='Edit Content', style=discord.ButtonStyle.primary)
+    @discord.ui.button(label='Edit Content', style=discord.ButtonStyle.danger)
     async def edit_content(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.sticky_data['message_type'] == 'plain':
             await interaction.response.send_modal(EditPlainTextModal(self.ctx, self.channel, self.sticky_data))
         else:
             await interaction.response.send_modal(EditEmbedModal(self.ctx, self.channel, self.sticky_data))
 
-    @discord.ui.button(label='Edit Settings', style=discord.ButtonStyle.secondary)
+    @discord.ui.button(label='Edit Settings', style=discord.ButtonStyle.danger)
     async def edit_settings(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(EditSettingsModal(self.ctx, self.channel, self.sticky_data))
 

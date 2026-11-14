@@ -151,15 +151,15 @@ class Paginator(discord.ui.View):
 
         # Update the Button Styles
         self.first_page_button.style = kwargs.get(
-            'first_button_style') or ButtonStyle.secondary
+            'first_button_style') or ButtonStyle.danger
         self.previous_page_button.style = kwargs.get(
-            'previous_button_style') or ButtonStyle.secondary
+            'previous_button_style') or ButtonStyle.danger
         self.stop_button.style = kwargs.get(
             'stop_button_style') or ButtonStyle.red
         self.next_page_button.style = kwargs.get(
-            'next_button_style') or ButtonStyle.secondary
+            'next_button_style') or ButtonStyle.danger
         self.last_page_button.style = kwargs.get(
-            'last_button_style') or ButtonStyle.secondary
+            'last_button_style') or ButtonStyle.danger
 
     async def paginate(self,
                        *,

@@ -53,7 +53,7 @@ class RoleInfoView(View):
     self.role = role
     self.author_id = author_id
 
-  @discord.ui.button(label='Show Permissions',  emoji=f"{CODEBASE} ", style=discord.ButtonStyle.secondary)
+  @discord.ui.button(label='Show Permissions',  emoji=f"{CODEBASE} ", style=discord.ButtonStyle.danger)
   async def show_permissions(self, interaction: discord.Interaction, button: Button):
     if interaction.user.id != self.author_id:
           await interaction.response.send_message("Uh oh! That message doesn't belong to you. You must run this command to interact with it.", ephemeral=True)
@@ -70,7 +70,7 @@ class OverwritesView(View):
       self.channel = channel
       self.author_id = author_id
 
-  @discord.ui.button(label='Show Overwrites', style=discord.ButtonStyle.primary)
+  @discord.ui.button(label='Show Overwrites', style=discord.ButtonStyle.danger)
   async def show_overwrites(self, interaction: discord.Interaction, button: Button):
       if interaction.user.id != self.author_id:
           await interaction.response.send_message("Uh oh! That message doesn't belong to you. You must run this command to interact with it.", ephemeral=True)
@@ -861,7 +861,7 @@ class Extra(commands.Cog):
         f"**NSFW:** {channel.is_nsfw()}"
     )
     view = OverwritesView(channel, ctx.author.id)
-    view.add_item(Button(label="Redirect Channel", style=discord.ButtonStyle.green, url=f"https://discord.com/channels/{ctx.guild.id}/{channel.id}"))
+    view.add_item(Button(label="Redirect Channel", style=discord.ButtonStyle.danger, url=f"https://discord.com/channels/{ctx.guild.id}/{channel.id}"))
     await ctx.send(content=ch_text, view=view)
 
 

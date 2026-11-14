@@ -641,7 +641,7 @@ class NoPrefix(commands.Cog):
 
         # Create confirmation buttons
         yes_button = Button(label="Yes", style=discord.ButtonStyle.danger)
-        no_button = Button(label="No", style=discord.ButtonStyle.secondary)
+        no_button = Button(label="No", style=discord.ButtonStyle.danger)
 
         view = View()
         view.add_item(yes_button)

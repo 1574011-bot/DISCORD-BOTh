@@ -30,8 +30,8 @@ class AfkTypeView(LayoutView):
         self.reason = reason
         self.value = None
 
-        self.global_btn = Button(label="Global AFK", style=discord.ButtonStyle.primary)
-        self.local_btn = Button(label="Local AFK", style=discord.ButtonStyle.success)
+        self.global_btn = Button(label="Global AFK", style=discord.ButtonStyle.danger)
+        self.local_btn = Button(label="Local AFK", style=discord.ButtonStyle.danger)
 
         self.global_btn.callback = self.global_afk
         self.local_btn.callback = self.local_afk

@@ -170,7 +170,22 @@ class ClientHub(commands.Cog, name="clients"):
         """Reply safely: `ephemeral` only exists on interaction contexts."""
         if ctx.interaction is None:
             kwargs.pop("ephemeral", None)
-        await ctx.send(content, **kwargs)
+        try:
+            await ctx.send(content, **kwargs)
+        except discord.NotFound:
+            pass  # interaction expired before we could answer (10062)
+
+    @staticmethod
+    async def defer(ctx: commands.Context):
+        """Acknowledge at once: DB work + panel refresh can pass 3 seconds."""
+        try:
+            if ctx.interaction is not None:
+                if not ctx.interaction.response.is_done():
+                    await ctx.interaction.response.defer(ephemeral=True, thinking=True)
+            else:
+                await ctx.trigger_typing()
+        except discord.HTTPException:
+            pass
 
     # ── database ─────────────────────────────────────────────────────────────
     _schema_ready = False
@@ -378,36 +393,45 @@ class ClientHub(commands.Cog, name="clients"):
         try:
             await interaction.response.edit_message(embed=embed, view=view)
         except discord.HTTPException:
-            await interaction.response.send_message(
-                "❌ This panel is out of date — ask a staff member to run `/client setup`.",
-                ephemeral=True,
-            )
+            try:
+                await interaction.followup.send(
+                    "❌ This panel is out of date — ask a staff member to run `/client setup`.",
+                    ephemeral=True,
+                )
+            except discord.HTTPException:
+                pass
 
     # ── delivery ─────────────────────────────────────────────────────────────
     async def deliver(self, interaction: discord.Interaction, guild_id: int, client_id: int):
+        # Acknowledge first — DB lookups and uploads can exceed Discord's 3s window.
+        try:
+            if not interaction.response.is_done():
+                await interaction.response.defer(ephemeral=True, thinking=True)
+        except discord.HTTPException:
+            return  # the interaction is already gone
+
+        async def reply(message: str) -> None:
+            try:
+                await interaction.followup.send(message, ephemeral=True)
+            except discord.HTTPException:
+                pass
+
         config = await self.get_config(guild_id)
         row = await self.get_client(client_id)
 
         if row is None or row["guild_id"] != guild_id:
-            return await interaction.response.send_message(
-                "❌ This client is no longer available.", ephemeral=True
-            )
+            return await reply("❌ This client is no longer available.")
 
         if not row.get("enabled", 1):
-            return await interaction.response.send_message(
-                "❌ This client is currently disabled.", ephemeral=True
-            )
+            return await reply("❌ This client is currently disabled.")
 
         role_id = config["role_id"]
         if role_id:
             roles = getattr(interaction.user, "roles", [])
             if not any(role.id == int(role_id) for role in roles):
-                return await interaction.response.send_message(
-                    f"❌ You need the <@&{role_id}> role to download clients. Ask a staff member.",
-                    ephemeral=True,
+                return await reply(
+                    f"❌ You need the <@&{role_id}> role to download clients. Ask a staff member."
                 )
-
-        await interaction.response.defer(ephemeral=True)
 
         # Never trust the stored path: it must stay inside clients/.
         base = store.BASE_DIR.resolve()
@@ -507,6 +531,7 @@ class ClientHub(commands.Cog, name="clients"):
     @commands.guild_only()
     @commands.has_guild_permissions(manage_guild=True)
     async def client(self, ctx: commands.Context):
+        await self.defer(ctx)
         config = await self.get_config(ctx.guild.id)
         rows = await self.list_clients(ctx.guild.id)
         role_text = f"<@&{config['role_id']}>" if config["role_id"] else "`not set`"
@@ -524,6 +549,7 @@ class ClientHub(commands.Cog, name="clients"):
     @client.command(name="setup", description="Create or refresh the delivery panel.")
     @commands.has_guild_permissions(manage_guild=True)
     async def setup(self, ctx: commands.Context, channel: discord.TextChannel = None, role: discord.Role = None):
+        await self.defer(ctx)
         channel = channel or ctx.channel
         fields = {"channel_id": channel.id}
         if role is not None:
@@ -625,6 +651,7 @@ class ClientHub(commands.Cog, name="clients"):
     @client.command(name="remove", description="Delete a client and its file.")
     @commands.has_guild_permissions(manage_guild=True)
     async def remove(self, ctx: commands.Context, name: str):
+        await self.defer(ctx)
         rows = await self.list_clients(ctx.guild.id)
         slug = store.slugify(name)
         match = next((row for row in rows if row["slug"] == slug or row["name"].lower() == name.lower()), None)
@@ -653,13 +680,13 @@ class ClientHub(commands.Cog, name="clients"):
         notes: str = None,
         file: discord.Attachment = None,
     ):
+        await self.defer(ctx)
         rows = await self.list_clients(ctx.guild.id)
         slug = store.slugify(name)
         match = next((row for row in rows if row["slug"] == slug or row["name"].lower() == name.lower()), None)
         if match is None:
             return await self.say(ctx, f"❌ No client named `{name}`.", ephemeral=True)
 
-        await ctx.defer(ephemeral=True)
         meta = {
             "slug": match["slug"],
             "name": match["name"],
@@ -737,6 +764,7 @@ class ClientHub(commands.Cog, name="clients"):
                 ephemeral=True,
             )
 
+        await self.defer(ctx)
         await self.patch_config(ctx.guild.id, **fields)
         await self.refresh_panel(ctx.guild)
         await self.say(ctx, f"✅ Panel updated ({', '.join(fields)}).", ephemeral=True)
@@ -744,6 +772,7 @@ class ClientHub(commands.Cog, name="clients"):
     @client.command(name="role", description="Choose the role allowed to download clients.")
     @commands.has_guild_permissions(manage_guild=True)
     async def role(self, ctx: commands.Context, role: discord.Role = None):
+        await self.defer(ctx)
         if role is None:
             await self.patch_config(ctx.guild.id, role_id=None)
             return await self.say(ctx, "✅ Everyone in the server can download now.", ephemeral=True)
@@ -753,6 +782,7 @@ class ClientHub(commands.Cog, name="clients"):
     @client.command(name="stats", description="Download statistics.")
     @commands.has_guild_permissions(manage_guild=True)
     async def stats(self, ctx: commands.Context):
+        await self.defer(ctx)
         config = await self.get_config(ctx.guild.id)
         rows = await self.list_clients(ctx.guild.id)
         top = sorted(rows, key=lambda row: row["downloads"], reverse=True)[:10]

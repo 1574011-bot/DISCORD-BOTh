@@ -65,6 +65,8 @@ class zyrox(commands.AutoShardedBot):
     async def on_app_command_error(self, interaction: discord.Interaction, error: Exception) -> None:
         """Answer /app commands instead of failing silently."""
         original = getattr(error, "original", error)
+        if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
+            return  # interaction expired (slow gateway) — nothing left to answer
         traceback.print_exception(type(original), original, original.__traceback__)
 
         ac = discord.app_commands
@@ -97,6 +99,8 @@ class zyrox(commands.AutoShardedBot):
             return
 
         original = getattr(error, "original", error)
+        if isinstance(original, discord.NotFound) and original.code in (10062, 10013):
+            return  # interaction expired (slow gateway) — nothing left to answer
         traceback.print_exception(type(original), original, original.__traceback__)
 
         if isinstance(original, commands.CommandOnCooldown):

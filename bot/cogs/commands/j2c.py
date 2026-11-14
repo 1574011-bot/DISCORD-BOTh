@@ -190,7 +190,8 @@ class JoinToCreate(commands.Cog):
                     continue
 
     @commands.hybrid_command(
-        name="j2csetup",
+        name="j2c",
+        aliases=["j2csetup"],
         description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
     )
     @commands.guild_only()
@@ -201,8 +202,17 @@ class JoinToCreate(commands.Cog):
         voice_channel: discord.VoiceChannel = None,
         panel_channel: discord.TextChannel = None,
     ):
-        if ctx.guild.id in self.setup_data:
-            await ctx.send(view=CV2("<:zcross:1571192938698907779> Error", "J2C system is already setup in this server!"))
+        previous = self.setup_data.get(ctx.guild.id)
+        if previous and voice_channel is None and panel_channel is None:
+            current_join = ctx.guild.get_channel(previous.get("join_channel_id") or 0)
+            current_panel = ctx.guild.get_channel(previous.get("control_channel_id") or 0)
+            await ctx.send(view=CV2(
+                "<:zsettings:1571192659291148420> J2C is already set up",
+                f"**Join channel:** {current_join.mention if current_join else 'deleted'}\n"
+                f"**Panel channel:** {current_panel.mention if current_panel else 'deleted'}\n\n"
+                "Run `/j2c voice_channel:#… panel_channel:#…` again to change them, "
+                "or `!j2creset` to remove the system."
+            ))
             return
 
         # Use the category of whichever channel was supplied, otherwise make one.
@@ -235,6 +245,15 @@ class JoinToCreate(commands.Cog):
         view = ControlPanelView(self, ctx.guild)
         control_message = await control_channel.send(view=view)
         
+        if previous:
+            old_channel = ctx.guild.get_channel(previous.get("control_channel_id") or 0)
+            old_message_id = previous.get("control_message_id")
+            if old_channel and old_message_id and old_message_id != control_message.id:
+                try:
+                    await old_channel.get_partial_message(old_message_id).delete()
+                except discord.HTTPException:
+                    pass
+
         self.setup_data[ctx.guild.id] = {
             "join_channel_id": join_channel.id,
             "control_channel_id": control_channel.id,

@@ -109,6 +109,14 @@ async def on_ready():
             print(f"Synced Total {len(all_commands)} Client Commands and {len(synced)} Slash Commands")
         except Exception as e:
             print(f"Error syncing command tree: {e}")
+        # Global sync can take up to an hour to reach clients. Copying the same
+        # commands per guild makes them show up in the picker immediately.
+        for guild in client.guilds:
+            try:
+                client.tree.copy_global_to(guild=guild)
+                await client.tree.sync(guild=guild)
+            except Exception as guild_error:
+                print(f"Error syncing commands for {guild.name}: {guild_error}")
 
     client.loop.create_task(sync_commands())
     client.loop.create_task(update_stats())

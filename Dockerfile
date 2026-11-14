@@ -31,4 +31,7 @@ COPY bot/ ./
 RUN mkdir -p db jsondb clients logs data lang
 
 EXPOSE 8000
-CMD ["python", "UND.py"]
+# Keep the container alive: if the bot process ever exits (gateway closed
+# cleanly, fatal error, …) it is started again after 5 seconds instead of
+# leaving the deployment marked as "Crashed".
+CMD ["sh", "-c", "while true; do python UND.py; echo '[supervisor] bot exited — restarting in 5s'; sleep 5; done"]

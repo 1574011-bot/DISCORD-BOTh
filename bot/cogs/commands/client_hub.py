@@ -32,7 +32,7 @@ from utils import client_store as store
 DB_PATH = "db/clients.db"
 MAX_PER_PAGE = 20          # 4 rows x 5 buttons, pagination lives in row 5
 DEFAULT_COLOR = 0xFF0000
-DEFAULT_TITLE = "🔴 UND Client Delivery"
+DEFAULT_TITLE = "<:red_button:1571192692040532008> UND Client Delivery"
 DEFAULT_DESCRIPTION = "Choose your client below — the file is sent privately to **you only**."
 DEFAULT_DISCLAIMER = (
     "UND doesn't host, endorse or distribute any client. Files are provided by the server "
@@ -345,7 +345,7 @@ class ClientHub(commands.Cog, name="clients"):
             color=int(config["color"] or DEFAULT_COLOR),
         )
         embed.add_field(
-            name="✅ Total Downloads",
+            name="<:ztick:1571192911532392561> Total Downloads",
             value=f"**{int(config['total_downloads'] or 0):,}**",
             inline=True,
         )
@@ -354,7 +354,7 @@ class ClientHub(commands.Cog, name="clients"):
             embed.set_image(url=config["banner_url"])
         if config["thumbnail_url"]:
             embed.set_thumbnail(url=config["thumbnail_url"])
-        embed.set_footer(text="⚠️ Educational purposes only — UND doesn't endorse any client.")
+        embed.set_footer(text="<:warning:1571192881098789074> Educational purposes only — UND doesn't endorse any client.")
         return embed
 
     async def panel_view(self, guild_id: int, page: int = 0) -> PanelView:
@@ -395,7 +395,7 @@ class ClientHub(commands.Cog, name="clients"):
         except discord.HTTPException:
             try:
                 await interaction.followup.send(
-                    "❌ This panel is out of date — ask a staff member to run `/client setup`.",
+                    "<:zcross:1571192938698907779> This panel is out of date — ask a staff member to run `/client setup`.",
                     ephemeral=True,
                 )
             except discord.HTTPException:
@@ -420,17 +420,17 @@ class ClientHub(commands.Cog, name="clients"):
         row = await self.get_client(client_id)
 
         if row is None or row["guild_id"] != guild_id:
-            return await reply("❌ This client is no longer available.")
+            return await reply("<:zcross:1571192938698907779> This client is no longer available.")
 
         if not row.get("enabled", 1):
-            return await reply("❌ This client is currently disabled.")
+            return await reply("<:zcross:1571192938698907779> This client is currently disabled.")
 
         role_id = config["role_id"]
         if role_id:
             roles = getattr(interaction.user, "roles", [])
             if not any(role.id == int(role_id) for role in roles):
                 return await reply(
-                    f"❌ You need the <@&{role_id}> role to download clients. Ask a staff member."
+                    f"<:zcross:1571192938698907779> You need the <@&{role_id}> role to download clients. Ask a staff member."
                 )
 
         # Never trust the stored path: it must stay inside clients/.
@@ -438,7 +438,7 @@ class ClientHub(commands.Cog, name="clients"):
         path = (store.BASE_DIR / str(row["file_path"] or "")).resolve()
         if base not in path.parents or not path.is_file():
             return await interaction.followup.send(
-                "❌ The file is missing on the host. Contact a staff member.", ephemeral=True
+                "<:zcross:1571192938698907779> The file is missing on the host. Contact a staff member.", ephemeral=True
             )
 
         size = path.stat().st_size
@@ -449,33 +449,33 @@ class ClientHub(commands.Cog, name="clients"):
         parts_count = 1 if size <= limit else -(-size // limit)
         if parts_count > store.MAX_PARTS:
             return await interaction.followup.send(
-                f"❌ This client is **{store.human_size(size)}** — too big even when split "
+                f"<:zcross:1571192938698907779> This client is **{store.human_size(size)}** — too big even when split "
                 f"({parts_count} parts). Ask a staff member for a direct link.",
                 ephemeral=True,
             )
 
         emoji = _safe_emoji(row.get("emoji"))
-        title = f"{emoji or '🔴'} {row['name']} {row.get('version') or ''}".strip()
+        title = f"{emoji or '<:red_button:1571192692040532008>'} {row['name']} {row.get('version') or ''}".strip()
         file_name = row.get("file_name") or path.name
         sha = row.get("sha256") or store.sha256_file(path)
 
-        description = "**Your file is attached below.**\n🔒 Only you can see this message.\n"
+        description = "**Your file is attached below.**\n<:lock:1571192761170788475> Only you can see this message.\n"
         if parts_count > 1:
             description = (
                 f"**Split into {parts_count} parts** ({store.human_size(limit)} max each).\n"
-                "🧩 Run **merge.bat** (Windows) or `cat *.part* > file` (Linux/macOS) "
+                "<:zmodule:1571192871158288384> Run **merge.bat** (Windows) or `cat *.part* > file` (Linux/macOS) "
                 "to rebuild the file — see `MERGE-INSTRUCTIONS.txt`.\n"
-                "🔒 Only you can see this message.\n"
+                "<:lock:1571192761170788475> Only you can see this message.\n"
             )
-        description += f"\n⚠️ **Disclaimer**\n{(config['disclaimer'] or DEFAULT_DISCLAIMER)[:3500]}"
+        description += f"\n<:warning:1571192881098789074> **Disclaimer**\n{(config['disclaimer'] or DEFAULT_DISCLAIMER)[:3500]}"
 
         embed = discord.Embed(title=title[:256], description=description, color=DEFAULT_COLOR)
         if row.get("notes"):
             embed.add_field(name="📝 Notes", value=row["notes"][:1024], inline=False)
         embed.add_field(name="📦 Size", value=store.human_size(size), inline=True)
         if parts_count > 1:
-            embed.add_field(name="🧩 Parts", value=f"`{parts_count}`", inline=True)
-        embed.add_field(name="🔒 SHA-256", value=f"`{sha[:32]}…`", inline=True)
+            embed.add_field(name="<:zmodule:1571192871158288384> Parts", value=f"`{parts_count}`", inline=True)
+        embed.add_field(name="<:lock:1571192761170788475> SHA-256", value=f"`{sha[:32]}…`", inline=True)
         embed.set_footer(text=f"UND • sent privately to {interaction.user}"[:2048])
 
         temp_dir = None
@@ -500,14 +500,14 @@ class ClientHub(commands.Cog, name="clients"):
                 for offset in range(0, len(rest), 10):
                     chunk = rest[offset:offset + 10]
                     await interaction.followup.send(
-                        content=f"🧩 Parts {offset + 9}–{offset + 9 + len(chunk) - 1} of {parts_count}",
+                        content=f"<:zmodule:1571192871158288384> Parts {offset + 9}–{offset + 9 + len(chunk) - 1} of {parts_count}",
                         files=[discord.File(p, filename=p.name) for p in chunk],
                         ephemeral=True,
                     )
         except (discord.HTTPException, OSError) as error:
             try:
                 await interaction.followup.send(
-                    f"❌ I couldn't upload the file ({type(error).__name__}). "
+                    f"<:zcross:1571192938698907779> I couldn't upload the file ({type(error).__name__}). "
                     "Try again in a moment or ask a staff member.",
                     ephemeral=True,
                 )
@@ -536,7 +536,7 @@ class ClientHub(commands.Cog, name="clients"):
         rows = await self.list_clients(ctx.guild.id)
         role_text = f"<@&{config['role_id']}>" if config["role_id"] else "`not set`"
         embed = discord.Embed(
-            title="🔴 Client Delivery",
+            title="<:red_button:1571192692040532008> Client Delivery",
             description=(
                 f"**Clients:** `{len(rows)}` • **Downloads:** `{int(config['total_downloads'] or 0):,}`\n"
                 f"**Role:** {role_text}\n\n"
@@ -558,9 +558,9 @@ class ClientHub(commands.Cog, name="clients"):
 
         message = await self.refresh_panel(ctx.guild)
         if message is None:
-            return await self.say(ctx, "❌ I cannot post in that channel.", ephemeral=True)
+            return await self.say(ctx, "<:zcross:1571192938698907779> I cannot post in that channel.", ephemeral=True)
         await self.say(ctx, 
-            f"✅ Panel ready in {channel.mention}"
+            f"<:ztick:1571192911532392561> Panel ready in {channel.mention}"
             + (f" — only {role.mention} can download." if role else ""),
             ephemeral=True,
         )
@@ -577,17 +577,17 @@ class ClientHub(commands.Cog, name="clients"):
     ):
         name = (name or "").strip()
         if not name:
-            return await self.say(ctx, "❌ Give the client a name.", ephemeral=True)
+            return await self.say(ctx, "<:zcross:1571192938698907779> Give the client a name.", ephemeral=True)
         emoji = (emoji or "").strip()
         if emoji and _safe_emoji(emoji) is None:
             return await self.say(
                 ctx,
-                "❌ Invalid emoji. Use a unicode emoji like ⭐ or a custom one like `<:name:id>`.",
+                "<:zcross:1571192938698907779> Invalid emoji. Use a unicode emoji like <:starr:1571192853500010706> or a custom one like `<:name:id>`.",
                 ephemeral=True,
             )
         if file.size > store.MAX_BYTES:
             return await self.say(ctx, 
-                f"❌ Max upload is **{store.human_size(store.MAX_BYTES)}**. Put the file in "
+                f"<:zcross:1571192938698907779> Max upload is **{store.human_size(store.MAX_BYTES)}**. Put the file in "
                 f"`clients/{ctx.guild.id}/<name>/` on the host and run `/client scan`.",
                 ephemeral=True,
             )
@@ -596,12 +596,12 @@ class ClientHub(commands.Cog, name="clients"):
             data = await file.read()
             meta = store.save_upload(ctx.guild.id, name, file.filename, data, version=version, emoji=emoji)
         except ValueError as error:
-            return await self.say(ctx, f"❌ {error}", ephemeral=True)
+            return await self.say(ctx, f"<:zcross:1571192938698907779> {error}", ephemeral=True)
 
         await self.upsert_client(ctx.guild.id, meta)
         await self.refresh_panel(ctx.guild)
         await self.say(ctx, 
-            f"✅ **{name}** added ({store.human_size(meta['size'])}) and the panel was refreshed.",
+            f"<:ztick:1571192911532392561> **{name}** added ({store.human_size(meta['size'])}) and the panel was refreshed.",
             ephemeral=True,
         )
 
@@ -617,12 +617,12 @@ class ClientHub(commands.Cog, name="clients"):
         if oversized:
             await self.say(
                 ctx,
-                "⚠️ Big files (auto-split when downloading): "
+                "<:warning:1571192881098789074> Big files (auto-split when downloading): "
                 + ", ".join(oversized[:5]),
                 ephemeral=True,
             )
         await self.say(ctx, 
-            f"✅ Scanned `clients/{ctx.guild.id}/` — **{len(found)}** client(s) registered.",
+            f"<:ztick:1571192911532392561> Scanned `clients/{ctx.guild.id}/` — **{len(found)}** client(s) registered.",
             ephemeral=True,
         )
 
@@ -639,7 +639,7 @@ class ClientHub(commands.Cog, name="clients"):
             for index, row in enumerate(rows[:40])
         ]
         embed = discord.Embed(
-            title=f"🔴 Clients ({len(rows)})",
+            title=f"<:red_button:1571192692040532008> Clients ({len(rows)})",
             description=(
                 "\n".join(lines)
                 + (f"\n…and {len(rows) - 40} more." if len(rows) > 40 else "")
@@ -656,7 +656,7 @@ class ClientHub(commands.Cog, name="clients"):
         slug = store.slugify(name)
         match = next((row for row in rows if row["slug"] == slug or row["name"].lower() == name.lower()), None)
         if match is None:
-            return await self.say(ctx, f"❌ No client named `{name}`.", ephemeral=True)
+            return await self.say(ctx, f"<:zcross:1571192938698907779> No client named `{name}`.", ephemeral=True)
 
         store.delete_client(ctx.guild.id, match["slug"])
         db = await self._connect()
@@ -667,7 +667,7 @@ class ClientHub(commands.Cog, name="clients"):
             await db.close()
 
         await self.refresh_panel(ctx.guild)
-        await self.say(ctx, f"🗑️ **{match['name']}** removed.", ephemeral=True)
+        await self.say(ctx, f"<:delete:1571192625413881866> **{match['name']}** removed.", ephemeral=True)
 
     @client.command(name="edit", description="Edit a client's version, emoji, notes or file.")
     @commands.has_guild_permissions(manage_guild=True)
@@ -685,7 +685,7 @@ class ClientHub(commands.Cog, name="clients"):
         slug = store.slugify(name)
         match = next((row for row in rows if row["slug"] == slug or row["name"].lower() == name.lower()), None)
         if match is None:
-            return await self.say(ctx, f"❌ No client named `{name}`.", ephemeral=True)
+            return await self.say(ctx, f"<:zcross:1571192938698907779> No client named `{name}`.", ephemeral=True)
 
         meta = {
             "slug": match["slug"],
@@ -702,7 +702,7 @@ class ClientHub(commands.Cog, name="clients"):
         if file is not None:
             if file.size > store.MAX_BYTES:
                 return await self.say(ctx, 
-                    f"❌ Max upload is **{store.human_size(store.MAX_BYTES)}**.", ephemeral=True
+                    f"<:zcross:1571192938698907779> Max upload is **{store.human_size(store.MAX_BYTES)}**.", ephemeral=True
                 )
             data = await file.read()
             saved = store.save_upload(
@@ -714,7 +714,7 @@ class ClientHub(commands.Cog, name="clients"):
         store.write_meta(store.client_dir(ctx.guild.id, meta["slug"]), meta)
         await self.upsert_client(ctx.guild.id, meta)
         await self.refresh_panel(ctx.guild)
-        await self.say(ctx, f"✅ **{meta['name']}** updated.", ephemeral=True)
+        await self.say(ctx, f"<:ztick:1571192911532392561> **{meta['name']}** updated.", ephemeral=True)
 
     @client.command(name="panel", description="Edit the panel embed (title, description, banner, color).")
     @commands.has_guild_permissions(manage_guild=True)
@@ -740,7 +740,7 @@ class ClientHub(commands.Cog, name="clients"):
         if color is not None:
             parsed = _parse_color(color)
             if parsed is None:
-                return await self.say(ctx, "❌ Color must be hex, e.g. `FF0000` or `#ff0000`.", ephemeral=True)
+                return await self.say(ctx, "<:zcross:1571192938698907779> Color must be hex, e.g. `FF0000` or `#ff0000`.", ephemeral=True)
             fields["color"] = parsed
         if disclaimer is not None:
             fields["disclaimer"] = disclaimer
@@ -755,7 +755,7 @@ class ClientHub(commands.Cog, name="clients"):
             value = fields.get(key)
             if value and not value.startswith(("http://", "https://")):
                 return await self.say(
-                    ctx, "❌ Banner/thumbnail must be a http(s) image URL.", ephemeral=True
+                    ctx, "<:zcross:1571192938698907779> Banner/thumbnail must be a http(s) image URL.", ephemeral=True
                 )
 
         if not fields:
@@ -767,7 +767,7 @@ class ClientHub(commands.Cog, name="clients"):
         await self.defer(ctx)
         await self.patch_config(ctx.guild.id, **fields)
         await self.refresh_panel(ctx.guild)
-        await self.say(ctx, f"✅ Panel updated ({', '.join(fields)}).", ephemeral=True)
+        await self.say(ctx, f"<:ztick:1571192911532392561> Panel updated ({', '.join(fields)}).", ephemeral=True)
 
     @client.command(name="role", description="Choose the role allowed to download clients.")
     @commands.has_guild_permissions(manage_guild=True)
@@ -775,9 +775,9 @@ class ClientHub(commands.Cog, name="clients"):
         await self.defer(ctx)
         if role is None:
             await self.patch_config(ctx.guild.id, role_id=None)
-            return await self.say(ctx, "✅ Everyone in the server can download now.", ephemeral=True)
+            return await self.say(ctx, "<:ztick:1571192911532392561> Everyone in the server can download now.", ephemeral=True)
         await self.patch_config(ctx.guild.id, role_id=role.id)
-        await self.say(ctx, f"✅ Only {role.mention} can download clients.", ephemeral=True)
+        await self.say(ctx, f"<:ztick:1571192911532392561> Only {role.mention} can download clients.", ephemeral=True)
 
     @client.command(name="stats", description="Download statistics.")
     @commands.has_guild_permissions(manage_guild=True)
@@ -788,7 +788,7 @@ class ClientHub(commands.Cog, name="clients"):
         top = sorted(rows, key=lambda row: row["downloads"], reverse=True)[:10]
         lines = [f"**{row['name']}** — {row['downloads']} downloads" for row in top] or ["No downloads yet."]
         embed = discord.Embed(
-            title="📊 Client downloads",
+            title="<:zyroxsys:1571193074883764224> Client downloads",
             description=(
                 f"**Total:** `{int(config['total_downloads'] or 0):,}`\n"
                 f"**Clients:** `{len(rows)}`\n\n" + "\n".join(lines)
@@ -800,13 +800,13 @@ class ClientHub(commands.Cog, name="clients"):
     @client.error
     async def client_error(self, ctx: commands.Context, error):
         if isinstance(error, commands.MissingPermissions):
-            await self.say(ctx, "❌ You need **Manage Server** to use this.", ephemeral=True)
+            await self.say(ctx, "<:zcross:1571192938698907779> You need **Manage Server** to use this.", ephemeral=True)
         elif isinstance(error, commands.MissingRequiredArgument):
-            await self.say(ctx, f"❌ Missing argument: `{error.param.name}`.", ephemeral=True)
+            await self.say(ctx, f"<:zcross:1571192938698907779> Missing argument: `{error.param.name}`.", ephemeral=True)
         elif isinstance(error, commands.BadArgument):
-            await self.say(ctx, f"❌ {error}", ephemeral=True)
+            await self.say(ctx, f"<:zcross:1571192938698907779> {error}", ephemeral=True)
         else:
-            await self.say(ctx, "❌ Something went wrong. Check the bot logs.", ephemeral=True)
+            await self.say(ctx, "<:zcross:1571192938698907779> Something went wrong. Check the bot logs.", ephemeral=True)
 
 
 async def setup(bot):

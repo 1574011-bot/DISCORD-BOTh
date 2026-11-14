@@ -394,3 +394,61 @@ FAIL = ERROR
 OK = SUCCESS
 NOT_OK = ERROR
 
+
+
+# ── plain unicode → application emoji ────────────────────────────────────────
+UNICODE_ALIASES = {
+    '✅': '<:ztick:1571192911532392561>',
+    '✔️': '<:Ztick:1571192990800806074>',
+    '❌': '<:zcross:1571192938698907779>',
+    '✖️': '<:zcross:1571192938698907779>',
+    '🔒': '<:lock:1571192761170788475>',
+    '🔓': '<:unlock:1571192807178113086>',
+    '⏳': '<:ztimer:1571193061567103126>',
+    '💬': '<:zmsg:1571192978461036565>',
+    '✉️': '<:zmsg:1571192978461036565>',
+    '👢': '<:zban:1571192856817958974>',
+    '🌍': '<:zyrox_global:1571192834378178741>',
+    '⭐': '<:starr:1571192853500010706>',
+    '🔄': '<:shuffle:1571192681487401051>',
+    '🗑️': '<:delete:1571192625413881866>',
+    '🚫': '<:Denied:1571193053358596198>',
+    '➕': '<:icons_plus:1571193012405407844>',
+    '🔴': '<:red_button:1571192692040532008>',
+    '🟢': '<:Enable:1571192656078315591>',
+    '📊': '<:zyroxsys:1571193074883764224>',
+    '📨': '<:zmsg:1571192978461036565>',
+    '🔗': '<:zyroxlinks:1571192744582324244>',
+    '🛡️': '<:zSafe:1571192845417848882>',
+    '👑': '<:king:1571192771530858516>',
+    '🎫': '<:zticket:1571192751268302948>',
+    '⚠️': '<:warning:1571192881098789074>',
+    '🕒': '<:zyrox_time:1571192774869516371>',
+    '🔍': '<:zyrox_search:1571193004910190734>',
+    '🏠': '<:icons_home:1571192935591059587>',
+    '🎮': '<:games:1571192893786423411>',
+    '🔔': '<:zyrox_mention:1571192877860528208>',
+    '⚙️': '<:zsettings:1571192659291148420>',
+    '🧩': '<:zmodule:1571192871158288384>',
+    '🎵': '<:zmusic:1571192811267555438>',
+    '📢': '<:zyrox_mention:1571192877860528208>',
+    '💞': '<:heart3:1571192997897437317>',
+    '❤️': '<:heart_em:1571193057330601991>',
+    '💻': '<:pc:1571193049453822093>',
+    '⬅️': '<:next:1571192958466920568>',
+    '➡️': '<:icons_next:1571192718044954765>',
+}
+
+
+def custom(text: str) -> str:
+    """Swap normal unicode emojis for the bot's own application emojis."""
+    if not text:
+        return text
+    for unicode_emoji, ref in UNICODE_ALIASES.items():
+        text = text.replace(unicode_emoji, ref)
+    return text
+
+
+def ui_emoji(value):
+    """Return the application emoji for a unicode emoji (or the value itself)."""
+    return UNICODE_ALIASES.get(value, value)

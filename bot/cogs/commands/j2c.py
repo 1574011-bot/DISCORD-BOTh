@@ -202,7 +202,7 @@ class JoinToCreate(commands.Cog):
         panel_channel: discord.TextChannel = None,
     ):
         if ctx.guild.id in self.setup_data:
-            await ctx.send(view=CV2("❌ Error", "J2C system is already setup in this server!"))
+            await ctx.send(view=CV2("<:zcross:1571192938698907779> Error", "J2C system is already setup in this server!"))
             return
 
         # Use the category of whichever channel was supplied, otherwise make one.
@@ -219,7 +219,7 @@ class JoinToCreate(commands.Cog):
         join_channel = voice_channel
         if join_channel is None:
             join_channel = await ctx.guild.create_voice_channel(
-                "➕ Join to Create",
+                "<:icons_plus:1571193012405407844> Join to Create",
                 category=category,
                 reason="J2C System Setup"
             )
@@ -244,7 +244,7 @@ class JoinToCreate(commands.Cog):
         await self.save_guild_setup(ctx.guild.id, self.setup_data[ctx.guild.id])
         
         await ctx.send(view=CV2(
-            "✅ Success",
+            "<:ztick:1571192911532392561> Success",
             f"J2C is ready!\n**Join channel:** {join_channel.mention}\n"
             f"**Panel channel:** {control_channel.mention}\n\n"
             "Members join the voice channel to get their own private room."
@@ -254,7 +254,7 @@ class JoinToCreate(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def reset_private_channels(self, ctx):
         if ctx.guild.id not in self.setup_data:
-            await ctx.send(view=CV2("❌ Error", "J2C system is not setup in this server!"))
+            await ctx.send(view=CV2("<:zcross:1571192938698907779> Error", "J2C system is not setup in this server!"))
             return
             
         data = self.setup_data.get(ctx.guild.id, {})
@@ -275,7 +275,7 @@ class JoinToCreate(commands.Cog):
         del self.setup_data[ctx.guild.id]
         await self.delete_guild_setup(ctx.guild.id)
         
-        await ctx.send(view=CV2("✅ Success", "J2C system has been completely reset in this server!"))
+        await ctx.send(view=CV2("<:ztick:1571192911532392561> Success", "J2C system has been completely reset in this server!"))
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -389,11 +389,11 @@ class ControlPanelView(LayoutView):
                 if owner:
                     status = []
                     if data["is_locked"]:
-                        status.append("🔒 Locked")
+                        status.append("<:lock:1571192761170788475> Locked")
                     if data["has_thread"]:
-                        status.append("💬 Thread")
+                        status.append("<:zmsg:1571192978461036565> Thread")
                     
-                    vc_info = f"<#{vc_id}> (👑 {owner.mention})"
+                    vc_info = f"<#{vc_id}> (<:king:1571192771530858516> {owner.mention})"
                     if status:
                         vc_info += f" [{' '.join(status)}]"
                     active_vcs.append(vc_info)
@@ -408,29 +408,29 @@ class ControlPanelView(LayoutView):
         )
         self.add_item(container)
 
-        b_limit = ui.Button(label="LIMIT", style=discord.ButtonStyle.blurple, custom_id="j2c:limit", emoji="⏳")
+        b_limit = ui.Button(label="LIMIT", style=discord.ButtonStyle.blurple, custom_id="j2c:limit", emoji="<:ztimer:1571193061567103126>")
         b_limit.callback = self.set_limit
-        b_privacy = ui.Button(label="PRIVACY", style=discord.ButtonStyle.blurple, custom_id="j2c:privacy", emoji="🔒")
+        b_privacy = ui.Button(label="PRIVACY", style=discord.ButtonStyle.blurple, custom_id="j2c:privacy", emoji="<:lock:1571192761170788475>")
         b_privacy.callback = self.toggle_privacy
-        b_thread = ui.Button(label="THREAD", style=discord.ButtonStyle.blurple, custom_id="j2c:thread", emoji="💬")
+        b_thread = ui.Button(label="THREAD", style=discord.ButtonStyle.blurple, custom_id="j2c:thread", emoji="<:zmsg:1571192978461036565>")
         b_thread.callback = self.create_thread
-        b_untrust = ui.Button(label="UNTRUST", style=discord.ButtonStyle.danger, custom_id="j2c:untrust", emoji="❌")
+        b_untrust = ui.Button(label="UNTRUST", style=discord.ButtonStyle.danger, custom_id="j2c:untrust", emoji="<:zcross:1571192938698907779>")
         b_untrust.callback = self.untrust
-        b_invite = ui.Button(label="INVITE", style=discord.ButtonStyle.danger, custom_id="j2c:invite", emoji="✉️")
+        b_invite = ui.Button(label="INVITE", style=discord.ButtonStyle.danger, custom_id="j2c:invite", emoji="<:zmsg:1571192978461036565>")
         b_invite.callback = self.invite_user
-        b_kick = ui.Button(label="KICK", style=discord.ButtonStyle.danger, custom_id="j2c:kick", emoji="👢")
+        b_kick = ui.Button(label="KICK", style=discord.ButtonStyle.danger, custom_id="j2c:kick", emoji="<:zban:1571192856817958974>")
         b_kick.callback = self.kick_user
-        b_region = ui.Button(label="REGION", style=discord.ButtonStyle.danger, custom_id="j2c:region", emoji="🌍")
+        b_region = ui.Button(label="REGION", style=discord.ButtonStyle.danger, custom_id="j2c:region", emoji="<:zyrox_global:1571192834378178741>")
         b_region.callback = self.set_region
-        b_unblock = ui.Button(label="UNBLOCK", style=discord.ButtonStyle.red, custom_id="j2c:unblock", emoji="🔓")
+        b_unblock = ui.Button(label="UNBLOCK", style=discord.ButtonStyle.red, custom_id="j2c:unblock", emoji="<:unlock:1571192807178113086>")
         b_unblock.callback = self.unblock
-        b_claim = ui.Button(label="CLAIM", style=discord.ButtonStyle.red, custom_id="j2c:claim", emoji="⭐")
+        b_claim = ui.Button(label="CLAIM", style=discord.ButtonStyle.red, custom_id="j2c:claim", emoji="<:starr:1571192853500010706>")
         b_claim.callback = self.claim
-        b_transfer = ui.Button(label="TRANSFER", style=discord.ButtonStyle.red, custom_id="j2c:transfer", emoji="🔄")
+        b_transfer = ui.Button(label="TRANSFER", style=discord.ButtonStyle.red, custom_id="j2c:transfer", emoji="<:shuffle:1571192681487401051>")
         b_transfer.callback = self.transfer
-        b_delete = ui.Button(label="DELETE", style=discord.ButtonStyle.red, custom_id="j2c:delete", emoji="🗑️")
+        b_delete = ui.Button(label="DELETE", style=discord.ButtonStyle.red, custom_id="j2c:delete", emoji="<:delete:1571192625413881866>")
         b_delete.callback = self.delete_vc
-        b_block = ui.Button(label="BLOCK", style=discord.ButtonStyle.danger, custom_id="j2c:block", emoji="🚫")
+        b_block = ui.Button(label="BLOCK", style=discord.ButtonStyle.danger, custom_id="j2c:block", emoji="<:Denied:1571193053358596198>")
         b_block.callback = self.block
 
         self.add_item(ActionRow(b_limit, b_privacy, b_thread))
@@ -464,7 +464,7 @@ class ControlPanelView(LayoutView):
         await vc.set_permissions(interaction.guild.default_role, connect=not is_locked)
         self.cog.private_channels[vc.id]["is_locked"] = is_locked
         await self.cog.save_private_channel(vc.id, interaction.guild.id, self.cog.private_channels[vc.id])
-        await interaction.followup.send(f"VC is now {'🔒 locked' if is_locked else '🔓 unlocked'}!", ephemeral=True)
+        await interaction.followup.send(f"VC is now {'<:lock:1571192761170788475> locked' if is_locked else '<:unlock:1571192807178113086> unlocked'}!", ephemeral=True)
         await self.cog.update_control_panel(interaction.guild)
 
     

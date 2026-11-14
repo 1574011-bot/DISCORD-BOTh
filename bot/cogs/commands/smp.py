@@ -157,7 +157,7 @@ async def audit(guild: discord.Guild | None, action: str, detail: str, actor_id:
     channel = guild.get_channel(channel_id)
     if channel is None:
         return
-    embed = discord.Embed(title="🛡️ SMP Audit", description=f"**{action}**\n{detail}"[:3900], color=COLOR_RED)
+    embed = discord.Embed(title="<:zSafe:1571192845417848882> SMP Audit", description=f"**{action}**\n{detail}"[:3900], color=COLOR_RED)
     embed.timestamp = datetime.now(timezone.utc)
     if actor_id:
         embed.set_footer(text=f"Actor ID: {actor_id}")
@@ -207,15 +207,15 @@ class ReviewView(discord.ui.View):
         super().__init__(timeout=None)
         self.cog = cog
 
-    @discord.ui.button(label="Approve", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_app_approve")
+    @discord.ui.button(label="Approve", emoji="<:ztick:1571192911532392561>", style=discord.ButtonStyle.danger, custom_id="smp_app_approve")
     async def approve(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "approved")
 
-    @discord.ui.button(label="Deny", emoji="❌", style=discord.ButtonStyle.danger, custom_id="smp_app_deny")
+    @discord.ui.button(label="Deny", emoji="<:zcross:1571192938698907779>", style=discord.ButtonStyle.danger, custom_id="smp_app_deny")
     async def deny(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "denied")
 
-    @discord.ui.button(label="Mark whitelisted", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_app_added")
+    @discord.ui.button(label="Mark whitelisted", emoji="<:ztick:1571192911532392561>", style=discord.ButtonStyle.danger, custom_id="smp_app_added")
     async def added(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_application(interaction, interaction.message.id, "added")
 
@@ -225,11 +225,11 @@ class LinkReviewView(discord.ui.View):
         super().__init__(timeout=None)
         self.cog = cog
 
-    @discord.ui.button(label="Approve link", emoji="✅", style=discord.ButtonStyle.danger, custom_id="smp_link_approve")
+    @discord.ui.button(label="Approve link", emoji="<:ztick:1571192911532392561>", style=discord.ButtonStyle.danger, custom_id="smp_link_approve")
     async def approve(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_link(interaction, interaction.message.id, "approved")
 
-    @discord.ui.button(label="Reject", emoji="❌", style=discord.ButtonStyle.danger, custom_id="smp_link_deny")
+    @discord.ui.button(label="Reject", emoji="<:zcross:1571192938698907779>", style=discord.ButtonStyle.danger, custom_id="smp_link_deny")
     async def deny(self, interaction: discord.Interaction, _button: discord.ui.Button):
         await self.cog.decide_link(interaction, interaction.message.id, "rejected")
 
@@ -280,13 +280,13 @@ class SMP(commands.Cog):
             return ""
         role = guild.get_role(role_id)
         if role is None:
-            return "⚠️ member role not found"
+            return "<:warning:1571192881098789074> member role not found"
         try:
             member = guild.get_member(user_id) or await guild.fetch_member(user_id)
             await member.add_roles(role, reason="SMP access granted")
             return ""
         except (discord.Forbidden, discord.HTTPException):
-            return "⚠️ could not add the member role"
+            return "<:warning:1571192881098789074> could not add the member role"
 
     async def notify_user(self, guild: discord.Guild, user_id: int, text: str) -> None:
         try:
@@ -303,14 +303,14 @@ class SMP(commands.Cog):
         review_id = (config or {}).get("review_channel_id")
         if not config or not review_id:
             return await interaction.followup.send(
-                "❌ SMP applications are not configured yet. Ask a staff member to run `/smp setup`.",
+                "<:zcross:1571192938698907779> SMP applications are not configured yet. Ask a staff member to run `/smp setup`.",
                 ephemeral=True,
             )
 
         ign = data["ign"]
         if not IGN_PATTERN.match(ign):
             return await interaction.followup.send(
-                "❌ That is not a valid Minecraft username (3–16 characters: letters, numbers, `_`).", ephemeral=True
+                "<:zcross:1571192938698907779> That is not a valid Minecraft username (3–16 characters: letters, numbers, `_`).", ephemeral=True
             )
 
         platform = "bedrock" if data["platform"].lower().startswith("b") else "java"
@@ -331,16 +331,16 @@ class SMP(commands.Cog):
                 taken = await cursor.fetchone()
 
         if previous and previous["status"] == "pending":
-            return await interaction.followup.send("⏳ You already have an application waiting for review.", ephemeral=True)
+            return await interaction.followup.send("<:ztimer:1571193061567103126> You already have an application waiting for review.", ephemeral=True)
         if previous and previous["status"] == "denied":
             decided = parse_iso(previous["created_at"])
             if decided and datetime.now(timezone.utc) - decided < REAPPLY_COOLDOWN:
                 return await interaction.followup.send(
-                    "⏳ Your last application was denied recently. You can try again in a few hours.", ephemeral=True
+                    "<:ztimer:1571193061567103126> Your last application was denied recently. You can try again in a few hours.", ephemeral=True
                 )
         if taken:
             return await interaction.followup.send(
-                f"❌ The username **{ign}** is already used by another application on this server.", ephemeral=True
+                f"<:zcross:1571192938698907779> The username **{ign}** is already used by another application on this server.", ephemeral=True
             )
 
         embed = discord.Embed(title="📝 SMP Application", color=COLOR_RED)
@@ -359,7 +359,7 @@ class SMP(commands.Cog):
             review_channel = guild.get_channel(review_id) or await guild.fetch_channel(review_id)
             message = await review_channel.send(embed=embed, view=ReviewView(self))
         except (discord.Forbidden, discord.HTTPException, AttributeError):
-            return await interaction.followup.send("❌ I cannot post in the review channel.", ephemeral=True)
+            return await interaction.followup.send("<:zcross:1571192938698907779> I cannot post in the review channel.", ephemeral=True)
 
         async with aiosqlite.connect(DB_PATH) as db:
             await db.execute(
@@ -372,7 +372,7 @@ class SMP(commands.Cog):
 
         await audit(guild, "Application submitted", f"{interaction.user.mention} → `{ign}`", interaction.user.id)
         await interaction.followup.send(
-            f"📨 Your application for **{ign}** was sent to the staff. You will get a DM once it is reviewed.",
+            f"<:zmsg:1571192978461036565> Your application for **{ign}** was sent to the staff. You will get a DM once it is reviewed.",
             ephemeral=True,
         )
 
@@ -381,7 +381,7 @@ class SMP(commands.Cog):
             return
         member = await self.staff_member(interaction)
         if member is None or not await self.is_staff(member):
-            return await interaction.response.send_message("❌ Staff only.", ephemeral=True)
+            return await interaction.response.send_message("<:zcross:1571192938698907779> Staff only.", ephemeral=True)
 
         async with aiosqlite.connect(DB_PATH) as db:
             db.row_factory = aiosqlite.Row
@@ -392,13 +392,13 @@ class SMP(commands.Cog):
                 row = await cursor.fetchone()
 
         if row is None:
-            return await interaction.response.send_message("❌ Application not found in the database.", ephemeral=True)
+            return await interaction.response.send_message("<:zcross:1571192938698907779> Application not found in the database.", ephemeral=True)
 
         status = row["status"]
         if action != "added" and status != "pending":
             return await interaction.response.send_message(f"ℹ️ This application is already **{status}**.", ephemeral=True)
         if action == "added" and status != "approved":
-            return await interaction.response.send_message("⚠️ Approve the application first.", ephemeral=True)
+            return await interaction.response.send_message("<:warning:1571192881098789074> Approve the application first.", ephemeral=True)
 
         await interaction.response.defer(ephemeral=True)
 
@@ -415,7 +415,7 @@ class SMP(commands.Cog):
             await self.notify_user(
                 interaction.guild,
                 row["user_id"],
-                f"✅ Your application for **{ign}** was **approved**!\n"
+                f"<:ztick:1571192911532392561> Your application for **{ign}** was **approved**!\n"
                 f"A staff member will whitelist you in-game shortly.\n"
                 f"{note}".strip(),
             )
@@ -424,14 +424,14 @@ class SMP(commands.Cog):
             await self.notify_user(
                 interaction.guild,
                 row["user_id"],
-                f"❌ Your application for **{ign}** was **denied**.\nYou can apply again later.",
+                f"<:zcross:1571192938698907779> Your application for **{ign}** was **denied**.\nYou can apply again later.",
             )
             await audit(interaction.guild, "Application denied", f"`{ign}` — {interaction.user.mention}", interaction.user.id)
         else:
             await self.notify_user(
                 interaction.guild,
                 row["user_id"],
-                f"🔴 You are now whitelisted on the SMP as **{ign}**. See you in-game!",
+                f"<:red_button:1571192692040532008> You are now whitelisted on the SMP as **{ign}**. See you in-game!",
             )
             await audit(interaction.guild, "Whitelisted", f"`{ign}` — {interaction.user.mention}", interaction.user.id)
 
@@ -446,7 +446,7 @@ class SMP(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             pass
 
-        await interaction.followup.send(f"✅ Application for `{ign}` → **{action}**.", ephemeral=True)
+        await interaction.followup.send(f"<:ztick:1571192911532392561> Application for `{ign}` → **{action}**.", ephemeral=True)
 
     # ── link flow ──────────────────────────────────────────────────────────
     async def create_link_request(self, interaction: discord.Interaction, ign: str, platform: str):
@@ -455,11 +455,11 @@ class SMP(commands.Cog):
         config = await get_config(guild.id)
         if not config or not config.get("host"):
             return await interaction.followup.send(
-                "❌ SMP is not configured yet. Ask staff to run `/smp setup`.", ephemeral=True
+                "<:zcross:1571192938698907779> SMP is not configured yet. Ask staff to run `/smp setup`.", ephemeral=True
             )
         review_id = config.get("review_channel_id") or config.get("apply_channel_id")
         if not IGN_PATTERN.match(ign):
-            return await interaction.followup.send("❌ That is not a valid Minecraft username.", ephemeral=True)
+            return await interaction.followup.send("<:zcross:1571192938698907779> That is not a valid Minecraft username.", ephemeral=True)
 
         platform = "bedrock" if platform.lower().startswith("b") else "java"
         ign_uuid = offline_uuid(ign)
@@ -479,10 +479,10 @@ class SMP(commands.Cog):
 
         if taken:
             return await interaction.followup.send(
-                f"❌ `{ign}` is already linked to another Discord account.", ephemeral=True
+                f"<:zcross:1571192938698907779> `{ign}` is already linked to another Discord account.", ephemeral=True
             )
         if current and current["status"] == "pending":
-            return await interaction.followup.send("⏳ Your link request is already waiting for staff.", ephemeral=True)
+            return await interaction.followup.send("<:ztimer:1571193061567103126> Your link request is already waiting for staff.", ephemeral=True)
         if current and current["status"] == "approved" and current["ign"].lower() == ign.lower():
             return await interaction.followup.send(f"ℹ️ Your account is already linked to `{ign}`.", ephemeral=True)
         if current and current["status"] == "approved":
@@ -490,10 +490,10 @@ class SMP(commands.Cog):
             if decided and datetime.now(timezone.utc) - decided < RELINK_COOLDOWN:
                 days = (RELINK_COOLDOWN - (datetime.now(timezone.utc) - decided)).days + 1
                 return await interaction.followup.send(
-                    f"⏳ You can only change your linked IGN once every 14 days ({days} day(s) left).", ephemeral=True
+                    f"<:ztimer:1571193061567103126> You can only change your linked IGN once every 14 days ({days} day(s) left).", ephemeral=True
                 )
 
-        embed = discord.Embed(title="🔗 SMP Account Link", color=COLOR_RED)
+        embed = discord.Embed(title="<:zyroxlinks:1571192744582324244> SMP Account Link", color=COLOR_RED)
         embed.add_field(name="Discord", value=f"{interaction.user.mention} (`{interaction.user.id}`)", inline=False)
         embed.add_field(name="IGN", value=f"`{ign}`", inline=True)
         embed.add_field(name="Platform", value=platform, inline=True)
@@ -512,7 +512,7 @@ class SMP(commands.Cog):
             message = await review_channel.send(embed=embed, view=LinkReviewView(self))
         except (discord.Forbidden, discord.HTTPException, AttributeError):
             return await interaction.followup.send(
-                "❌ I cannot post the link request here. Staff: add **review_channel** to `/smp setup`.",
+                "<:zcross:1571192938698907779> I cannot post the link request here. Staff: add **review_channel** to `/smp setup`.",
                 ephemeral=True,
             )
 
@@ -529,7 +529,7 @@ class SMP(commands.Cog):
 
         await audit(guild, "Link requested", f"{interaction.user.mention} → `{ign}`", interaction.user.id)
         await interaction.followup.send(
-            f"🔗 Link request for **{ign}** sent to the staff for approval.", ephemeral=True
+            f"<:zyroxlinks:1571192744582324244> Link request for **{ign}** sent to the staff for approval.", ephemeral=True
         )
 
     async def decide_link(self, interaction: discord.Interaction, message_id: int, decision: str):
@@ -537,7 +537,7 @@ class SMP(commands.Cog):
             return
         member = await self.staff_member(interaction)
         if member is None or not await self.is_staff(member):
-            return await interaction.response.send_message("❌ Staff only.", ephemeral=True)
+            return await interaction.response.send_message("<:zcross:1571192938698907779> Staff only.", ephemeral=True)
 
         async with aiosqlite.connect(DB_PATH) as db:
             db.row_factory = aiosqlite.Row
@@ -548,7 +548,7 @@ class SMP(commands.Cog):
                 row = await cursor.fetchone()
 
         if row is None:
-            return await interaction.response.send_message("❌ Link request not found.", ephemeral=True)
+            return await interaction.response.send_message("<:zcross:1571192938698907779> Link request not found.", ephemeral=True)
         if row["status"] != "pending":
             return await interaction.response.send_message(f"ℹ️ This request is already **{row['status']}**.", ephemeral=True)
 
@@ -571,7 +571,7 @@ class SMP(commands.Cog):
                         (now_iso(), interaction.user.id, interaction.guild.id, row["user_id"]),
                     )
                     await db.commit()
-                await interaction.followup.send(f"❌ `{ign}` is already linked to another member.", ephemeral=True)
+                await interaction.followup.send(f"<:zcross:1571192938698907779> `{ign}` is already linked to another member.", ephemeral=True)
                 return
 
             async with aiosqlite.connect(DB_PATH) as db:
@@ -591,7 +591,7 @@ class SMP(commands.Cog):
             await self.notify_user(
                 interaction.guild,
                 row["user_id"],
-                f"✅ Your Discord account is now linked to **{ign}**.{chr(10) + note if note else ''}",
+                f"<:ztick:1571192911532392561> Your Discord account is now linked to **{ign}**.{chr(10) + note if note else ''}",
             )
             await audit(interaction.guild, "Link approved", f"`{ign}` — <@{row['user_id']}> by {interaction.user.mention}", interaction.user.id)
         else:
@@ -602,7 +602,7 @@ class SMP(commands.Cog):
                 )
                 await db.commit()
             await self.notify_user(
-                interaction.guild, row["user_id"], f"❌ Your link request for **{ign}** was rejected."
+                interaction.guild, row["user_id"], f"<:zcross:1571192938698907779> Your link request for **{ign}** was rejected."
             )
             await audit(interaction.guild, "Link rejected", f"`{ign}` — <@{row['user_id']}> by {interaction.user.mention}", interaction.user.id)
 
@@ -614,14 +614,14 @@ class SMP(commands.Cog):
         except (discord.Forbidden, discord.HTTPException):
             pass
 
-        await interaction.followup.send(f"✅ Link for `{ign}` → **{decision}**.", ephemeral=True)
+        await interaction.followup.send(f"<:ztick:1571192911532392561> Link for `{ign}` → **{decision}**.", ephemeral=True)
 
     # ── user commands ──────────────────────────────────────────────────────
     @commands.hybrid_command(name="apply", description="Apply to join the SMP.")
     @commands.guild_only()
     async def apply_cmd(self, ctx: commands.Context):
         if ctx.interaction is None:
-            return await ctx.send("❌ Applications must be sent with the slash command `/apply`.")
+            return await ctx.send("<:zcross:1571192938698907779> Applications must be sent with the slash command `/apply`.")
         await ctx.interaction.response.send_modal(ApplyModal(self, ctx.interaction))
 
     @commands.hybrid_command(name="link", description="Link your Discord account to your Minecraft username.")
@@ -629,7 +629,7 @@ class SMP(commands.Cog):
     @commands.guild_only()
     async def link_cmd(self, ctx: commands.Context, ign: str, platform: str = "java"):
         if ctx.interaction is None:
-            return await ctx.send("❌ Please use the slash command `/link <ign>`.")
+            return await ctx.send("<:zcross:1571192938698907779> Please use the slash command `/link <ign>`.")
         await self.create_link_request(ctx.interaction, ign.strip(), platform)
 
     @commands.hybrid_group(name="smp", invoke_without_command=True, description="SMP panel and settings.")
@@ -637,10 +637,10 @@ class SMP(commands.Cog):
     async def smp(self, ctx: commands.Context):
         config = await get_config(ctx.guild.id)
         if not config:
-            return await ctx.send("❌ Not configured. Staff: `/smp setup host:<ip>`")
+            return await ctx.send("<:zcross:1571192938698907779> Not configured. Staff: `/smp setup host:<ip>`")
         await ctx.send(
             embed=discord.Embed(
-                title="🎮 SMP",
+                title="<:games:1571192893786423411> SMP",
                 description=(
                     f"**Server:** `{config['host']}`\n"
                     "**Apply:** `/apply`\n**Link:** `/link <ign>`\n\n"
@@ -688,10 +688,10 @@ class SMP(commands.Cog):
         await audit(ctx.guild, "Setup updated", ", ".join(f"{k}={v}" for k, v in fields.items()), ctx.author.id)
 
         status = await fetch_status(fields["host"], fields.get("port") or None)
-        reachable = "🟢 reachable" if status and status.get("online") else "🔴 not reachable"
+        reachable = "<:Enable:1571192656078315591> reachable" if status and status.get("online") else "<:red_button:1571192692040532008> not reachable"
         await ctx.send(
             embed=discord.Embed(
-                title="✅ SMP configured",
+                title="<:ztick:1571192911532392561> SMP configured",
                 description=f"**Host:** `{fields['host']}`\n**Status:** {reachable}",
                 color=COLOR_RED,
             )
@@ -701,14 +701,14 @@ class SMP(commands.Cog):
     async def smp_status(self, ctx: commands.Context):
         config = await get_config(ctx.guild.id)
         if not config:
-            return await ctx.send("❌ Not configured. Staff: `/smp setup host:<ip>`")
+            return await ctx.send("<:zcross:1571192938698907779> Not configured. Staff: `/smp setup host:<ip>`")
         await ctx.defer()
         status = await fetch_status(config["host"], config.get("port") or None)
         if not status or not status.get("online"):
             return await ctx.send(
-                embed=discord.Embed(title="🔴 Offline", description=f"`{config['host']}` did not answer.", color=COLOR_RED)
+                embed=discord.Embed(title="<:red_button:1571192692040532008> Offline", description=f"`{config['host']}` did not answer.", color=COLOR_RED)
             )
-        embed = discord.Embed(title=f"🟢 {config['host']}", color=COLOR_RED)
+        embed = discord.Embed(title=f"<:Enable:1571192656078315591> {config['host']}", color=COLOR_RED)
         embed.add_field(name="Players", value=f"`{status['players_online']}/{status['players_max']}`", inline=True)
         embed.add_field(name="Version", value=f"`{status['version']}`", inline=True)
         embed.add_field(name="MOTD", value=status["motd"][:200] or "—", inline=False)
@@ -734,7 +734,7 @@ class SMP(commands.Cog):
 
         if row is None and app_row is None:
             return await ctx.send("ℹ️ You have no linked account. Use `/link <ign>`.")
-        embed = discord.Embed(title="🔗 Your SMP profile", color=COLOR_RED)
+        embed = discord.Embed(title="<:zyroxlinks:1571192744582324244> Your SMP profile", color=COLOR_RED)
         if row:
             embed.add_field(name="IGN", value=f"`{row['ign']}` ({row['platform']})", inline=True)
             embed.add_field(name="Link status", value=row["status"], inline=True)
@@ -746,7 +746,7 @@ class SMP(commands.Cog):
     @smp.command(name="pending", description="List pending applications and links (staff).")
     async def smp_pending(self, ctx: commands.Context):
         if not await self.is_staff(ctx.author):
-            return await ctx.send("❌ Staff only.")
+            return await ctx.send("<:zcross:1571192938698907779> Staff only.")
         async with aiosqlite.connect(DB_PATH) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(
@@ -762,7 +762,7 @@ class SMP(commands.Cog):
             ) as cursor:
                 links = await cursor.fetchall()
 
-        embed = discord.Embed(title="⏳ Pending SMP requests", color=COLOR_RED)
+        embed = discord.Embed(title="<:ztimer:1571193061567103126> Pending SMP requests", color=COLOR_RED)
         embed.add_field(
             name=f"Applications ({len(apps)})",
             value="\n".join(f"• <@{r['user_id']}> → `{r['ign']}`" for r in apps[:10]) or "—",
@@ -779,7 +779,7 @@ class SMP(commands.Cog):
     @app_commands.describe(member="Member to look up")
     async def smp_whois(self, ctx: commands.Context, member: discord.Member):
         if not await self.is_staff(ctx.author):
-            return await ctx.send("❌ Staff only.")
+            return await ctx.send("<:zcross:1571192938698907779> Staff only.")
         async with aiosqlite.connect(DB_PATH) as db:
             db.row_factory = aiosqlite.Row
             async with db.execute(
@@ -812,9 +812,9 @@ class SMP(commands.Cog):
     @app_commands.describe(ign="Minecraft username")
     async def smp_whitelistcmd(self, ctx: commands.Context, ign: str):
         if not await self.is_staff(ctx.author):
-            return await ctx.send("❌ Staff only.")
+            return await ctx.send("<:zcross:1571192938698907779> Staff only.")
         if not IGN_PATTERN.match(ign):
-            return await ctx.send("❌ Invalid username.")
+            return await ctx.send("<:zcross:1571192938698907779> Invalid username.")
         await ctx.send(
             embed=discord.Embed(
                 title="Server console command",

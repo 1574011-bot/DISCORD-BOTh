@@ -76,7 +76,7 @@ class MentionSelectView(LayoutView):
             )
         elif selected == "Developer Info":
             content = (
-                "Made and owned by **Kurapika** — all credit goes to him ❤️\n\n"
+                "Made and owned by **Kurapika** — all credit goes to him <:heart_em:1571193057330601991>\n\n"
                 "**Main Owner**\n"
                 "**[01]. [Kurapika](https://discord.com/users/1462466148770648189)**"
             )

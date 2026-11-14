@@ -70,7 +70,7 @@ def create_stats_content(stats_data, selected):
         ),
         "Team Info": (
             "I was built, designed and maintained by **Kurapika**.\n"
-            "All credit goes to him ❤️\n\n"
+            "All credit goes to him <:heart_em:1571193057330601991>\n\n"
             f"**{ZYROX_OWNER} Main Owner**\n"
             "[01]. [Kurapika](https://discord.com/users/1462466148770648189)\n"
             "[02]. [Support Server](https://discord.gg/und)"

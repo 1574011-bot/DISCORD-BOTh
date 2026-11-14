@@ -33,7 +33,7 @@ class MapView(LayoutView):
         
         self.update_map()
 
-        b_left = ui.Button(label="", emoji="⬅️", style=ButtonStyle.danger)
+        b_left = ui.Button(label="", emoji="<:next:1571192958466920568>", style=ButtonStyle.danger)
         b_left.callback = self.move_left
         b_up = ui.Button(label="", emoji="⬆️", style=ButtonStyle.danger)
         b_up.callback = self.move_up
@@ -41,7 +41,7 @@ class MapView(LayoutView):
         b_delete.callback = self.delete_embed
         b_down = ui.Button(label="", emoji="⬇️", style=ButtonStyle.danger)
         b_down.callback = self.move_down
-        b_right = ui.Button(label="", emoji="➡️", style=ButtonStyle.danger)
+        b_right = ui.Button(label="", emoji="<:icons_next:1571192718044954765>", style=ButtonStyle.danger)
         b_right.callback = self.move_right
 
         self.add_item(ActionRow(b_left, b_up, b_delete, b_down, b_right))

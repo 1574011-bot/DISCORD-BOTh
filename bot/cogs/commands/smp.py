@@ -252,11 +252,26 @@ class SMP(commands.Cog):
 
     # ── helpers ────────────────────────────────────────────────────────────
     async def is_staff(self, member: discord.Member) -> bool:
+        if await self.bot.is_owner(member):
+            return True
         if member.guild_permissions.manage_guild:
             return True
         config = await get_config(member.guild.id)
         role_id = (config or {}).get("staff_role_id")
         return bool(role_id) and any(role.id == role_id for role in member.roles)
+
+    async def staff_member(self, interaction: discord.Interaction):
+        """Return the invoking Member even when interaction.member is missing."""
+        guild = interaction.guild
+        if guild is None:
+            return None
+        member = guild.get_member(interaction.user.id)
+        if member is None:
+            try:
+                member = await guild.fetch_member(interaction.user.id)
+            except discord.HTTPException:
+                return None
+        return member
 
     async def apply_member_role(self, guild: discord.Guild, user_id: int) -> str:
         config = await get_config(guild.id)
@@ -364,7 +379,8 @@ class SMP(commands.Cog):
     async def decide_application(self, interaction: discord.Interaction, message_id: int, action: str):
         if interaction.guild is None:
             return
-        if not await self.is_staff(interaction.member):
+        member = await self.staff_member(interaction)
+        if member is None or not await self.is_staff(member):
             return await interaction.response.send_message("❌ Staff only.", ephemeral=True)
 
         async with aiosqlite.connect(DB_PATH) as db:
@@ -519,7 +535,8 @@ class SMP(commands.Cog):
     async def decide_link(self, interaction: discord.Interaction, message_id: int, decision: str):
         if interaction.guild is None:
             return
-        if not await self.is_staff(interaction.member):
+        member = await self.staff_member(interaction)
+        if member is None or not await self.is_staff(member):
             return await interaction.response.send_message("❌ Staff only.", ephemeral=True)
 
         async with aiosqlite.connect(DB_PATH) as db:

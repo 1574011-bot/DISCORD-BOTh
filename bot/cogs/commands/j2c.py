@@ -189,28 +189,48 @@ class JoinToCreate(commands.Cog):
                     print(f"Error in J2C on_ready: {e}")
                     continue
 
-    @commands.command(name='j2csetup')
-    @commands.has_permissions(administrator=True)
-    async def setup_private_channels(self, ctx):
+    @commands.hybrid_command(
+        name="j2csetup",
+        description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
+    )
+    @commands.guild_only()
+    @commands.has_guild_permissions(administrator=True)
+    async def setup_private_channels(
+        self,
+        ctx,
+        voice_channel: discord.VoiceChannel = None,
+        panel_channel: discord.TextChannel = None,
+    ):
         if ctx.guild.id in self.setup_data:
             await ctx.send(view=CV2("❌ Error", "J2C system is already setup in this server!"))
             return
-            
-        category = discord.utils.get(ctx.guild.categories, name=self.category_name)
-        if not category:
+
+        # Use the category of whichever channel was supplied, otherwise make one.
+        category = None
+        for channel in (voice_channel, panel_channel):
+            if channel is not None and channel.category is not None:
+                category = channel.category
+                break
+        if category is None:
+            category = discord.utils.get(ctx.guild.categories, name=self.category_name)
+        if category is None:
             category = await ctx.guild.create_category(self.category_name)
-        
-        join_channel = await ctx.guild.create_voice_channel(
-            "➕ Join to Create",
-            category=category,
-            reason="J2C System Setup"
-        )
-        
-        control_channel = await ctx.guild.create_text_channel(
-            "ctrl-panel",
-            category=category,
-            reason="J2C System Setup"
-        )
+
+        join_channel = voice_channel
+        if join_channel is None:
+            join_channel = await ctx.guild.create_voice_channel(
+                "➕ Join to Create",
+                category=category,
+                reason="J2C System Setup"
+            )
+
+        control_channel = panel_channel
+        if control_channel is None:
+            control_channel = await ctx.guild.create_text_channel(
+                "ctrl-panel",
+                category=category,
+                reason="J2C System Setup"
+            )
         
         view = ControlPanelView(self, ctx.guild)
         control_message = await control_channel.send(view=view)
@@ -218,11 +238,17 @@ class JoinToCreate(commands.Cog):
         self.setup_data[ctx.guild.id] = {
             "join_channel_id": join_channel.id,
             "control_channel_id": control_channel.id,
-            "control_message_id": control_message.id
+            "control_message_id": control_message.id,
+            "category_id": category.id if category else None,
         }
         await self.save_guild_setup(ctx.guild.id, self.setup_data[ctx.guild.id])
         
-        await ctx.send(view=CV2("✅ Success", f"J2C system setup complete! Join {join_channel.mention} to create a private VC."))
+        await ctx.send(view=CV2(
+            "✅ Success",
+            f"J2C is ready!\n**Join channel:** {join_channel.mention}\n"
+            f"**Panel channel:** {control_channel.mention}\n\n"
+            "Members join the voice channel to get their own private room."
+        ))
 
     @commands.command(name='j2creset')
     @commands.has_permissions(administrator=True)
@@ -231,19 +257,15 @@ class JoinToCreate(commands.Cog):
             await ctx.send(view=CV2("❌ Error", "J2C system is not setup in this server!"))
             return
             
-        category = discord.utils.get(ctx.guild.categories, name=self.category_name)
-        if category:
-            for channel in category.channels:
+        data = self.setup_data.get(ctx.guild.id, {})
+        for key in ("control_channel_id", "join_channel_id"):
+            channel_id = data.get(key)
+            channel = ctx.guild.get_channel(channel_id) if channel_id else None
+            if channel is not None:
                 try:
                     await channel.delete(reason="J2C System Reset")
-                except:
-                    continue
-        
-        if category:
-            try:
-                await category.delete(reason="J2C System Reset")
-            except:
-                pass
+                except discord.HTTPException:
+                    pass
         
         vc_ids = [vc_id for vc_id, data in self.private_channels.items() 
                  if data.get("guild_id") == ctx.guild.id]

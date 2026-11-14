@@ -190,8 +190,7 @@ class JoinToCreate(commands.Cog):
                     continue
 
     @commands.hybrid_command(
-        name="j2c",
-        aliases=["j2csetup"],
+        name="j2csetup",
         description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
     )
     @commands.guild_only()
@@ -268,6 +267,21 @@ class JoinToCreate(commands.Cog):
             f"**Panel channel:** {control_channel.mention}\n\n"
             "Members join the voice channel to get their own private room."
         ))
+
+    @commands.hybrid_command(
+        name="j2c",
+        description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
+    )
+    @commands.guild_only()
+    @commands.has_guild_permissions(administrator=True)
+    async def j2c_shortcut(
+        self,
+        ctx,
+        voice_channel: discord.VoiceChannel = None,
+        panel_channel: discord.TextChannel = None,
+    ):
+        """Short slash alias of /j2csetup."""
+        await self.setup_private_channels.callback(self, ctx, voice_channel, panel_channel)
 
     @commands.command(name='j2creset')
     @commands.has_permissions(administrator=True)

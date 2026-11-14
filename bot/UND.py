@@ -375,6 +375,11 @@ if __name__ == "__main__":
     import datetime
     import traceback
     import faulthandler
+    import sys
+    if not TOKEN:
+        print("\033[31m◈ TOKEN is missing. Set it in Railway → Variables (or bot/.env) and redeploy.\033[0m")
+        _log_crash("TOKEN is missing — refusing to start.")
+        sys.exit(1)
     try:
         os.makedirs("logs", exist_ok=True)
         _crash_file = open("logs/crash.log", "a", encoding="utf-8")

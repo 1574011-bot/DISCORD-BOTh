@@ -193,14 +193,29 @@ class JoinToCreate(commands.Cog):
         name="j2csetup",
         description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
     )
-    @commands.guild_only()
-    @commands.has_guild_permissions(administrator=True)
     async def setup_private_channels(
         self,
         ctx,
         voice_channel: discord.VoiceChannel = None,
         panel_channel: discord.TextChannel = None,
     ):
+        if ctx.guild is None:
+            await ctx.send(view=CV2(
+                "<:zcross:1571192938698907779> Server only",
+                "J2C is server-only — run `/j2c` inside your server, not in DMs."
+            ))
+            return
+
+        author = getattr(ctx, "author", None)
+        permissions = getattr(author, "guild_permissions", None)
+        if permissions is not None and not permissions.administrator:
+            if not await self.bot.is_owner(author):
+                await ctx.send(view=CV2(
+                    "<:zcross:1571192938698907779> Missing permissions",
+                    "You need the **Administrator** permission to set up J2C."
+                ))
+                return
+
         previous = self.setup_data.get(ctx.guild.id)
         if previous and voice_channel is None and panel_channel is None:
             current_join = ctx.guild.get_channel(previous.get("join_channel_id") or 0)
@@ -272,8 +287,6 @@ class JoinToCreate(commands.Cog):
         name="j2c",
         description="Set up J2C — pick the join-to-create voice channel and the panel channel.",
     )
-    @commands.guild_only()
-    @commands.has_guild_permissions(administrator=True)
     async def j2c_shortcut(
         self,
         ctx,

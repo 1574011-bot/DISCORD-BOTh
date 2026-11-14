@@ -564,19 +564,47 @@ class ClientHub(commands.Cog, name="clients"):
         )
         await self.say(ctx, embed=embed)
 
+    @staticmethod
+    async def _resolve_channel(guild, raw):
+        """Resolve an ID, a <#mention> or a channel name without transformers."""
+        text = str(raw or "").strip()
+        if text.startswith("<#") and text.endswith(">"):
+            text = text[2:-1]
+        elif text.startswith("#"):
+            text = text[1:]
+        if not text:
+            return None
+        if text.isdigit():
+            channel = guild.get_channel(int(text))
+            if channel is None:
+                try:
+                    channel = await guild.fetch_channel(int(text))
+                except Exception:
+                    channel = None
+            return channel
+        return discord.utils.get(guild.text_channels, name=text)
+
     @client.command(name="setup", description="Create or refresh the delivery panel.")
+    @discord.app_commands.describe(
+        channel="Channel ID, #mention or name — leave empty to use this channel.",
+        role="Role allowed to download the clients.",
+    )
     @_client_staff()
-    async def setup(self, ctx: commands.Context, channel: discord.abc.GuildChannel = None, role: discord.Role = None):
+    async def setup(self, ctx: commands.Context, channel: str = None, role: discord.Role = None):
         await self.defer(ctx)
-        # Accept any channel from the picker (text, news, voice…) and fall back to
-        # a usable text channel instead of failing during argument conversion.
-        if channel is not None and not isinstance(channel, (discord.TextChannel, discord.Thread)):
-            await self.say(ctx, "<:zcross:1571192938698907779> That is not a text channel — using this channel instead.", ephemeral=True)
-            channel = None
-        channel = channel or ctx.channel
-        if not isinstance(channel, (discord.TextChannel, discord.Thread)):
-            await self.say(ctx, "<:zcross:1571192938698907779> Run this in a text channel (or pass one) to place the panel.", ephemeral=True)
+        # The channel is taken as text (ID / #mention / name) on purpose: Discord's
+        # channel option transformer raised TransformerError for some users.
+        target = ctx.channel
+        if channel:
+            resolved = await self._resolve_channel(ctx.guild, channel)
+            if resolved is not None and callable(getattr(resolved, "send", None)):
+                target = resolved
+            else:
+                await self.say(ctx, "<:zcross:1571192938698907779> Channel not found — using this channel instead.", ephemeral=True)
+        if not callable(getattr(target, "send", None)):
+            await self.say(ctx, "<:zcross:1571192938698907779> Run this in a text channel to place the panel.", ephemeral=True)
             return
+        channel = target
         fields = {"channel_id": channel.id}
         if role is not None:
             fields["role_id"] = role.id

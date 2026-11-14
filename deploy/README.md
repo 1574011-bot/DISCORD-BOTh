@@ -90,3 +90,43 @@ CF_TUNNEL_URL="https://api.yourdomain.com"
 
 Without the tunnel you can still run the dashboard locally
 (`http://localhost:3000` talking to `http://localhost:8000/api/v1`).
+
+## 4 · Railway (always-on, 24/7)
+
+The repo root ships `Dockerfile` + `railway.json`, so Railway builds a real
+Docker image (no Railpack guessing, no `pip install` on every restart).
+
+1. <https://railway.app> → **New Project → Deploy from GitHub repo** →
+   `DISCORD-BOTh`, branch `main`.
+2. **Settings → Build**: Builder `Dockerfile`, Dockerfile Path `Dockerfile`
+   (taken from `railway.json`, only check it once).
+3. **Variables** (never commit these):
+
+   ```env
+   TOKEN=...
+   OWNER_IDS=...
+   BRAND_NAME=UND
+   LAVALINK_HOST=...
+   LAVALINK_PORT=80
+   LAVALINK_SECURE=false
+   LAVALINK_PASSWORD=...
+   EMOJI_SYNC=true
+   API_ENABLED=false
+   TUNNEL_ENABLED=false
+   ```
+
+4. **Volumes** — without them every setting/database is wiped on redeploy:
+   mount `/app/db`, `/app/jsondb` (and `/app/clients` if you use `/client`).
+5. **Replicas = 1** — two replicas mean two gateway connections and every
+   command running twice.
+6. **Public Networking**: off. The bot needs no inbound port while
+   `API_ENABLED=false`.
+
+Deploy logs should end with:
+
+```
+Loaded & Online!
+Logged in as: <your bot>#0000
+EmojiSync: Sync complete: N already matching
+Music: Lavalink node connected.
+```

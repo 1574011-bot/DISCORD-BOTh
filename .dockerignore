@@ -4,7 +4,15 @@
 **/venv
 **/__pycache__
 **/*.pyc
-dashboard/node_modules
-dashboard/.next
+dashboard
 deploy
 *.log
+
+# Never bake local secrets or runtime data into an image
+bot/.env
+bot/.env.*
+bot/db
+bot/jsondb
+bot/clients
+bot/logs
+bot/*.db

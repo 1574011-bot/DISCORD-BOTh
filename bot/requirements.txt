@@ -30,6 +30,8 @@ gtts
 chess
 mcstatus
 wavelink>=2.0.0
+# discord.py needs PyNaCl for the voice gateway; without it voice connects fail.
+PyNaCl
 pycloudflared
 
 # NOTE: `prodia` is no longer published on PyPI. The /imagine command

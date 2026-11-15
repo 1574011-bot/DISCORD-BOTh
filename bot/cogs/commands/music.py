@@ -15,7 +15,7 @@ from discord.ext import commands, tasks
 import datetime
 from discord.ui import Button, View, LayoutView, TextDisplay, Separator, Container, ActionRow
 import wavelink
-from wavelink.enums import TrackSource
+from wavelink.enums import TrackSource, NodeStatus
 from utils import Paginator, DescriptionEmbedPaginator
 from core import Cog, zyrox, Context
 from PIL import Image, ImageDraw, ImageFont, ImageOps
@@ -159,7 +159,17 @@ class SearchResultView(LayoutView):
                 return
 
             track = self.results[index]
-            vc = self.ctx.voice_client or await self.ctx.author.voice.channel.connect(cls=wavelink.Player)
+            if not self.ctx.author.voice:
+                await interaction.response.send_message(
+                    "You need to be in a voice channel to play.", ephemeral=True
+                )
+                return
+            vc = await self.ctx.cog._voice_connect(self.ctx, self.ctx.author.voice.channel)
+            if vc is None:
+                await interaction.response.send_message(
+                    "I couldn't connect to the voice channel. Try again.", ephemeral=True
+                )
+                return
             vc.ctx = self.ctx
 
             if not vc.playing:
@@ -453,12 +463,82 @@ class Music(commands.Cog):
 
 
 
+    async def _ensure_node(self) -> bool:
+        """Return True when a Lavalink node is connected, reconnecting it if needed."""
+        nodes = list(getattr(wavelink.Pool, "nodes", {}).values())
+        if any(getattr(node, "status", None) == NodeStatus.CONNECTED for node in nodes):
+            return True
+        # Drop dead nodes first: a stale node makes every voice connect time out.
+        for node in nodes:
+            try:
+                await node.close()
+            except Exception:
+                pass
+        try:
+            await self.connect_nodes()
+            await asyncio.sleep(1)
+        except Exception as exc:
+            print(f"◈ Music: node reconnect failed — {exc}")
+            return False
+        return any(
+            getattr(node, "status", None) == NodeStatus.CONNECTED
+            for node in getattr(wavelink.Pool, "nodes", {}).values()
+        )
+
+    async def _voice_connect(self, ctx, channel):
+        """Join `channel` with retries — wavelink's voice handshake times out fast."""
+        if not await self._ensure_node():
+            await ctx.send(view=CV2(
+                f"{WARNING} Music is offline right now — the Lavalink node isn't responding. "
+                "Try again in a minute."
+            ))
+            return None
+
+        player = ctx.voice_client
+        if player is not None and not getattr(player, "connected", False):
+            # A half-open voice client from a failed attempt blocks the next connect.
+            try:
+                await player.disconnect(force=True)
+            except Exception:
+                pass
+            player = None
+        if player is not None:
+            return player
+
+        timeouts = (25.0, 15.0, 15.0)
+        for attempt, timeout in enumerate(timeouts, start=1):
+            try:
+                player = await channel.connect(
+                    cls=wavelink.Player, timeout=timeout, self_deaf=True
+                )
+                player.ctx = ctx
+                return player
+            except (wavelink.ChannelTimeoutException, wavelink.InvalidChannelStateException):
+                stale = ctx.voice_client
+                if stale is not None:
+                    try:
+                        await stale.disconnect(force=True)
+                    except Exception:
+                        pass
+                if attempt < len(timeouts):
+                    await asyncio.sleep(1.2)
+            except discord.HTTPException:
+                break
+
+        await ctx.send(view=CV2(
+            f"{WARNING} I couldn't join **{channel.name}** — Discord's voice handshake timed out. "
+            "Try again in a moment, or change the channel's voice region."
+        ))
+        return None
+
     async def play_source(self, ctx, query):
         if not ctx.author.voice:
             await ctx.send(view=CV2(f"{WARNING} you need to be in a voice channel to use this command."))
             return
 
-        vc = ctx.voice_client or await ctx.author.voice.channel.connect(cls=wavelink.Player)
+        vc = await self._voice_connect(ctx, ctx.author.voice.channel)
+        if vc is None:
+            return
         vc.ctx = ctx
         
         
@@ -923,8 +1003,9 @@ class Music(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def join(self, ctx: commands.Context):
         if ctx.author.voice:
-            await ctx.author.voice.channel.connect(cls=wavelink.Player)
-            await ctx.send(view=CV2("Joined the voice channel."))
+            player = await self._voice_connect(ctx, ctx.author.voice.channel)
+            if player is not None:
+                await ctx.send(view=CV2("Joined the voice channel."))
         else:
             await ctx.send(view=CV2("You need to join a voice channel first."))
 

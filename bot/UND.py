@@ -14,9 +14,10 @@ import sys
 # database file: cogs imported below touch SQLite at import time, which made the
 # volume link fail with "Directory not empty".
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from utils.storage import persist_runtime_dirs
+from utils.storage import persist_runtime_dirs, restore_databases
 
 persist_runtime_dirs()
+restore_databases()
 print("[build] commit=" + (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "local")[:7] + " branch=" + (os.getenv("RAILWAY_GIT_BRANCH") or "-"))
 
 import subprocess

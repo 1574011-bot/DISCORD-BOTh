@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import sqlite3
 import time
 
 RUNTIME_DIRS = ("db", "jsondb", "clients", "logs")
@@ -52,7 +53,16 @@ def _merge_tree(source: str, destination: str) -> None:
                 os.rmdir(src)
             except OSError:
                 pass
-        elif not os.path.exists(dst):
+        elif os.path.exists(dst):
+            # The volume already holds this file — the local copy is ephemeral.
+            try:
+                if os.path.isdir(src) and not os.path.islink(src):
+                    shutil.rmtree(src)
+                else:
+                    os.remove(src)
+            except OSError:
+                pass
+        else:
             shutil.move(src, dst)
 
 
@@ -91,19 +101,30 @@ def persist_runtime_dirs(root: str | None = None) -> str | None:
                     continue
                 os.unlink(link)
             elif os.path.isdir(link):
+                if os.path.ismount(link):
+                    print(f"[storage] {name}/ is its own mount — already persistent")
+                    continue
                 # First run after the switch: keep whatever is still on disk.
                 _merge_tree(link, target)
                 try:
                     os.rmdir(link)
-                except OSError:
-                    # Something still holds the folder (open SQLite file, …):
-                    # rename it out of the way instead of crashing the whole link.
-                    backup = f"{link}.local-{int(time.time())}"
+                except OSError as exc:
+                    # Duplicates the merge could not drop (open files, race, …).
+                    leftover = os.listdir(link)
+                    print(f"[storage] {name}/ not empty after merge ({exc}); clearing {leftover[:5]}")
+                    for entry in leftover:
+                        path = os.path.join(link, entry)
+                        try:
+                            if os.path.isdir(path) and not os.path.islink(path):
+                                shutil.rmtree(path)
+                            else:
+                                os.remove(path)
+                        except OSError:
+                            pass
                     try:
-                        os.rename(link, backup)
-                        print(f"[storage] kept local {name}/ as {os.path.basename(backup)}")
-                    except OSError as move_exc:
-                        print(f"[storage] could not move {name}/ aside ({move_exc})")
+                        os.rmdir(link)
+                    except OSError as final_exc:
+                        print(f"[storage] could not replace {name}/ ({final_exc}) — keeping local copy")
                         continue
             elif os.path.exists(link):
                 continue
@@ -116,3 +137,62 @@ def persist_runtime_dirs(root: str | None = None) -> str | None:
     PERSIST_ROOT = root
     print(f"[storage] persistent data: {root} ({", ".join(RUNTIME_DIRS)})")
     return root
+
+
+BACKUP_DIRNAME = "db-backup"
+
+
+def backup_dir() -> str | None:
+    return os.path.join(PERSIST_ROOT, BACKUP_DIRNAME) if PERSIST_ROOT else None
+
+
+def snapshot_databases() -> int:
+    """Copy every db/*.db onto the volume (SQLite backup API, safe while open)."""
+    destination = backup_dir()
+    if not destination:
+        return 0
+    if not os.path.isdir("db"):
+        return 0
+    os.makedirs(destination, exist_ok=True)
+    copied = 0
+    for name in sorted(os.listdir("db")):
+        if not name.endswith(".db"):
+            continue
+        source = os.path.join("db", name)
+        if not os.path.isfile(source):
+            continue
+        target = os.path.join(destination, name)
+        try:
+            with sqlite3.connect(source, timeout=5) as src, sqlite3.connect(target, timeout=5) as dst:
+                src.backup(dst)
+            copied += 1
+        except sqlite3.Error:
+            try:
+                shutil.copy2(source, target)
+                copied += 1
+            except OSError:
+                pass
+    return copied
+
+
+def restore_databases() -> int:
+    """Fill db/ from the volume snapshot — used when a folder could not be linked."""
+    source = backup_dir()
+    if not source or not os.path.isdir(source):
+        return 0
+    os.makedirs("db", exist_ok=True)
+    restored = 0
+    for name in sorted(os.listdir(source)):
+        if not name.endswith(".db"):
+            continue
+        target = os.path.join("db", name)
+        if os.path.exists(target):
+            continue
+        try:
+            shutil.copy2(os.path.join(source, name), target)
+            restored += 1
+        except OSError:
+            pass
+    if restored:
+        print(f"[storage] restored {restored} database file(s) from {source}")
+    return restored

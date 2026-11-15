@@ -94,6 +94,8 @@ class zyrox(commands.AutoShardedBot):
             await self.load_extensions()
         if not self.status_task.is_running():
             self.status_task.start()
+        if not self.db_backup_task.is_running():
+            self.db_backup_task.start()
 
     # ── error handling ────────────────────────────────────────────────────────
 
@@ -224,6 +226,25 @@ class zyrox(commands.AutoShardedBot):
             except Exception as e:
                 print(f"{Fore.RED}{Style.BRIGHT}Failed to load extension {extension}. {e}")
         print(Fore.GREEN + Style.BRIGHT + "*" * 20)
+
+    @tasks.loop(minutes=5)
+    async def db_backup_task(self):
+        """Keep a copy of every SQLite file on the volume, even if db/ is a mount."""
+        try:
+            from utils.storage import snapshot_databases
+            copied = await asyncio.to_thread(snapshot_databases)
+            if copied:
+                print(f"[storage] backed up {copied} database file(s)")
+        except Exception as exc:
+            print(f"[storage] backup failed — {exc}")
+
+    async def close(self):
+        try:
+            from utils.storage import snapshot_databases
+            await asyncio.to_thread(snapshot_databases)
+        except Exception:
+            pass
+        await super().close()
 
     @tasks.loop(seconds=30)
     async def status_task(self):

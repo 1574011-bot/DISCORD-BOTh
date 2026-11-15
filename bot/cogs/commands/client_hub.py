@@ -539,6 +539,12 @@ class ClientHub(commands.Cog, name="clients"):
             await self.bump_downloads(guild_id, client_id, interaction.user.id)
         except aiosqlite.Error:
             pass  # the file was delivered; counters are best effort
+        # The panel shows the total, so it has to be redrawn after every delivery.
+        try:
+            if interaction.guild is not None:
+                await self.refresh_panel(interaction.guild)
+        except (discord.HTTPException, aiosqlite.Error):
+            pass
 
     # ── commands ─────────────────────────────────────────────────────────────
     @commands.hybrid_group(
@@ -558,7 +564,7 @@ class ClientHub(commands.Cog, name="clients"):
             description=(
                 f"**Clients:** `{len(rows)}` • **Downloads:** `{int(config['total_downloads'] or 0):,}`\n"
                 f"**Role:** {role_text}\n\n"
-                "`/client setup` • `/client add` • `/client scan` • `/client list` • `/client panel`"
+                "`/client setup` • `/client add` • `/client scan` • `/client list` • `/client panel` • `/client setdownloads`"
             ),
             color=DEFAULT_COLOR,
         )
@@ -867,6 +873,47 @@ class ClientHub(commands.Cog, name="clients"):
             return await self.say(ctx, "<:ztick:1571192911532392561> Everyone in the server can download now.", ephemeral=True)
         await self.patch_config(ctx.guild.id, role_id=role.id)
         await self.say(ctx, f"<:ztick:1571192911532392561> Only {role.mention} can download clients.", ephemeral=True)
+
+    @client.command(name="setdownloads", description="Set the download counter — fake a number or reset it.")
+    @discord.app_commands.describe(
+        amount="The number the counter should show.",
+        client="Optional client name — only that client's counter changes.",
+    )
+    @_client_staff()
+    async def setdownloads(self, ctx: commands.Context, amount: int, client: str = None):
+        if amount < 0:
+            return await self.say(ctx, "<:zcross:1571192938698907779> Use a positive number.", ephemeral=True)
+        await self.defer(ctx)
+        if client:
+            rows = await self.list_clients(ctx.guild.id)
+            slug = store.slugify(client)
+            match = next(
+                (row for row in rows if row["slug"] == slug or row["name"].lower() == client.lower()),
+                None,
+            )
+            if match is None:
+                return await self.say(
+                    ctx, f"<:zcross:1571192938698907779> No client named `{client}`.", ephemeral=True
+                )
+            db = await self._connect()
+            try:
+                await db.execute("UPDATE clients SET downloads = ? WHERE id = ?", (amount, match["id"]))
+                await db.commit()
+            finally:
+                await db.close()
+            await self.refresh_panel(ctx.guild)
+            return await self.say(
+                ctx,
+                f"<:ztick:1571192911532392561> **{match['name']}** now shows **{amount:,}** downloads.",
+                ephemeral=True,
+            )
+        await self.patch_config(ctx.guild.id, total_downloads=amount)
+        await self.refresh_panel(ctx.guild)
+        await self.say(
+            ctx,
+            f"<:ztick:1571192911532392561> Total downloads set to **{amount:,}**.",
+            ephemeral=True,
+        )
 
     @client.command(name="stats", description="Download statistics.")
     @_client_staff()

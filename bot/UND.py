@@ -49,6 +49,12 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 # every guild's setup. Must run before any cog opens a database.
 from utils.storage import persist_runtime_dirs
 persist_runtime_dirs()
+print(
+    "[build] commit="
+    + (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "local")[:7]
+    + " branch="
+    + (os.getenv("RAILWAY_GIT_BRANCH") or "-")
+)
 
 TOKEN = os.getenv("TOKEN")
 

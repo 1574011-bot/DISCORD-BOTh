@@ -75,6 +75,7 @@ from .commands.smp import SMP
 from .commands.slash_bridge import SlashBridge
 from .commands.slash_help import SlashHelp
 from .commands.client_hub import ClientHub
+from .commands.diag import Diagnostics
 from .commands.encryption import encryption
 from .commands.calc import calculator
 from .commands.joindm import joindm
@@ -258,6 +259,7 @@ async def setup(bot: zyrox):
   await bot.add_cog(SlashBridge(bot))
   await bot.add_cog(SlashHelp(bot))
   await bot.add_cog(ClientHub(bot))
+  await bot.add_cog(Diagnostics(bot))
   await bot.add_cog(encryption(bot))
   await bot.add_cog(calculator(bot))
   await bot.add_cog(joindm(bot))

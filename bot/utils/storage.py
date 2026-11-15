@@ -24,6 +24,8 @@ import os
 import shutil
 
 RUNTIME_DIRS = ("db", "jsondb", "clients", "logs")
+# Where the data actually lives once linking ran (None = local, wiped on redeploy).
+PERSIST_ROOT: str | None = None
 
 
 def _volume_root() -> str | None:
@@ -83,5 +85,7 @@ def persist_runtime_dirs(root: str | None = None) -> str | None:
         except OSError as exc:
             print(f"[storage] could not persist {name}/ ({exc})")
 
+    global PERSIST_ROOT
+    PERSIST_ROOT = root
     print(f"[storage] persistent data: {root} ({", ".join(RUNTIME_DIRS)})")
     return root

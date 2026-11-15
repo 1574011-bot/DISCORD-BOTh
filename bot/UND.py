@@ -44,6 +44,12 @@ os.environ["JISHAKU_FORCE_PAGINATOR"] = "True"
 
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
+
+# Keep db/, jsondb/ and clients/ on the host volume so a redeploy doesn't wipe
+# every guild's setup. Must run before any cog opens a database.
+from utils.storage import persist_runtime_dirs
+persist_runtime_dirs()
+
 TOKEN = os.getenv("TOKEN")
 
 # --- Configuration ---

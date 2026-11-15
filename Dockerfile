@@ -26,9 +26,11 @@ COPY bot/ ./
 # Runtime folders. The code opens SQLite files under db/ and JSON stores under
 # jsondb/ on first use; without these the container crashes with
 # "unable to open database file".
-# Mount Railway volumes on /app/db, /app/jsondb (and /app/clients) to keep
-# data across deploys.
-RUN mkdir -p db jsondb clients logs data lang
+#
+# Persistence: attach ONE Railway volume at /data (recommended). UND.py reads
+# RAILWAY_VOLUME_MOUNT_PATH/DATA_DIR and links db/, jsondb/ and clients/ into
+# it, so every guild's setup survives redeploys.
+RUN mkdir -p db jsondb clients logs data lang /data
 
 EXPOSE 8000
 # Keep the container alive: if the bot process ever exits (gateway closed

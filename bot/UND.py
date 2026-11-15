@@ -8,6 +8,17 @@
 # ╚══════════════════════════════════════════════════════════════════╝
 
 import os
+import sys
+
+# Persist db/, jsondb/, clients/ and logs/ before ANY other import opens a
+# database file: cogs imported below touch SQLite at import time, which made the
+# volume link fail with "Directory not empty".
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils.storage import persist_runtime_dirs
+
+persist_runtime_dirs()
+print("[build] commit=" + (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "local")[:7] + " branch=" + (os.getenv("RAILWAY_GIT_BRANCH") or "-"))
+
 import subprocess
 # os.system("")
 import asyncio
@@ -45,16 +56,6 @@ os.environ["JISHAKU_FORCE_PAGINATOR"] = "True"
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
-# Keep db/, jsondb/ and clients/ on the host volume so a redeploy doesn't wipe
-# every guild's setup. Must run before any cog opens a database.
-from utils.storage import persist_runtime_dirs
-persist_runtime_dirs()
-print(
-    "[build] commit="
-    + (os.getenv("RAILWAY_GIT_COMMIT_SHA") or "local")[:7]
-    + " branch="
-    + (os.getenv("RAILWAY_GIT_BRANCH") or "-")
-)
 
 TOKEN = os.getenv("TOKEN")
 

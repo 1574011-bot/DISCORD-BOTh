@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import time
 
 RUNTIME_DIRS = ("db", "jsondb", "clients", "logs")
 # Where the data actually lives once linking ran (None = local, wiped on redeploy).
@@ -34,6 +35,25 @@ def _volume_root() -> str | None:
         if value:
             return os.path.abspath(value)
     return None
+
+
+
+def _merge_tree(source: str, destination: str) -> None:
+    """Move everything from `source` into `destination` without overwriting."""
+    os.makedirs(destination, exist_ok=True)
+    for entry in os.listdir(source):
+        src = os.path.join(source, entry)
+        dst = os.path.join(destination, entry)
+        if os.path.isdir(src) and not os.path.islink(src):
+            if os.path.exists(dst) and not os.path.isdir(dst):
+                continue
+            _merge_tree(src, dst)
+            try:
+                os.rmdir(src)
+            except OSError:
+                pass
+        elif not os.path.exists(dst):
+            shutil.move(src, dst)
 
 
 def persist_runtime_dirs(root: str | None = None) -> str | None:
@@ -72,12 +92,19 @@ def persist_runtime_dirs(root: str | None = None) -> str | None:
                 os.unlink(link)
             elif os.path.isdir(link):
                 # First run after the switch: keep whatever is still on disk.
-                for entry in os.listdir(link):
-                    source = os.path.join(link, entry)
-                    destination = os.path.join(target, entry)
-                    if not os.path.exists(destination):
-                        shutil.move(source, destination)
-                os.rmdir(link)
+                _merge_tree(link, target)
+                try:
+                    os.rmdir(link)
+                except OSError:
+                    # Something still holds the folder (open SQLite file, …):
+                    # rename it out of the way instead of crashing the whole link.
+                    backup = f"{link}.local-{int(time.time())}"
+                    try:
+                        os.rename(link, backup)
+                        print(f"[storage] kept local {name}/ as {os.path.basename(backup)}")
+                    except OSError as move_exc:
+                        print(f"[storage] could not move {name}/ aside ({move_exc})")
+                        continue
             elif os.path.exists(link):
                 continue
 

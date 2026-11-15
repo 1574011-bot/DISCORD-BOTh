@@ -38,6 +38,8 @@ def _dir_state(name: str) -> str:
         except OSError:
             target = "?"
         return f"`{name}` → `{target}`"
+    if path.is_dir() and os.path.ismount(path):
+        return f"`{name}` (own mount — persistent)"
     return f"`{name}` (local, not persisted)"
 
 

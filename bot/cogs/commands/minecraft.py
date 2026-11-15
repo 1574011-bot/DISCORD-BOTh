@@ -67,7 +67,10 @@ class SetupModal(ui.Modal, title="Minecraft Server Setup"):
             embed, file, view = await self.cog.generate_response(
                 interaction.guild, detected_type, ip, port, interaction.user.id
             )
-            sent_message = await interaction.channel.send(embed=embed, file=file, view=view)
+            send_kwargs = {"embed": embed, "view": view}
+            if file is not None:
+                send_kwargs["file"] = file
+            sent_message = await interaction.channel.send(**send_kwargs)
         except discord.Forbidden:
             await interaction.followup.send(
                 f"{EMOJI_ERROR} I can't post here — give me **Send Messages** and "
@@ -129,8 +132,10 @@ class Minecraft(commands.Cog):
         os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
         os.makedirs(os.path.dirname(FONT_PATH), exist_ok=True)
         os.makedirs(os.path.dirname(BACKGROUND_PATH), exist_ok=True)
-        self.bot.loop.create_task(self.init_db())
         self.refresh_all_statuses.start()
+
+    async def cog_load(self):
+        await self.init_db()
 
     async def init_db(self):
         async with aiosqlite.connect(DB_PATH) as db:
@@ -213,7 +218,9 @@ class Minecraft(commands.Cog):
             player_text = f"{status_data.get('players_online', 0)}/{status_data.get('players_max', 0)}"
             bbox = draw.textbbox((0, 0), player_text, font=font_medium)
             draw.text((CANVAS_WIDTH - (bbox[2] - bbox[0]) - 20, 15), player_text, font=font_medium, fill=(255, 255, 255))
-            motd = (status_data.get('motd', 'Offline') or "A Minecraft Server").split('')[0]
+            motd = (status_data.get('motd', 'Offline') or "A Minecraft Server").split("\n")[0].strip()
+            while motd and draw.textlength(motd, font=font_large) > CANVAS_WIDTH - 40:
+                motd = motd[:-1]
             bbox = draw.textbbox((0,0), motd, font=font_large)
             draw.text(((CANVAS_WIDTH - (bbox[2] - bbox[0])) // 2, 60), motd, font=font_large, fill=(0, 255, 255))
             power_text = "Powered by STACY"
@@ -223,8 +230,12 @@ class Minecraft(commands.Cog):
             img.save(buffer, "PNG")
             buffer.seek(0)
             return File(buffer, filename="status.png")
-        except FileNotFoundError: return None
-        except Exception: return None
+        except FileNotFoundError as exc:
+            print(f"◈ Minecraft: image assets missing — {exc}")
+            return None
+        except Exception as exc:
+            print(f"◈ Minecraft: status image failed — {type(exc).__name__}: {exc}")
+            return None
 
     async def generate_response(self, guild, server_type, ip, port, user_id):
         _, status, favicon = await self.auto_detect_server(ip, port)
@@ -329,7 +340,10 @@ class Minecraft(commands.Cog):
         if not row:
             return await interaction.followup.send(f"{EMOJI_WARNING} No server configured. Use `/minecraft setup`.", ephemeral=True)
         embed, file, _ = await self.generate_response(interaction.guild, row[0], row[1], row[2], row[3])
-        await interaction.followup.send(embed=embed, file=file, ephemeral=False)
+        send_kwargs = {"embed": embed, "ephemeral": False}
+        if file is not None:
+            send_kwargs["file"] = file
+        await interaction.followup.send(**send_kwargs)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Minecraft(bot))

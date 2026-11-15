@@ -23,7 +23,7 @@ from __future__ import annotations
 import os
 import shutil
 
-RUNTIME_DIRS = ("db", "jsondb", "clients")
+RUNTIME_DIRS = ("db", "jsondb", "clients", "logs")
 
 
 def _volume_root() -> str | None:
@@ -83,5 +83,5 @@ def persist_runtime_dirs(root: str | None = None) -> str | None:
         except OSError as exc:
             print(f"[storage] could not persist {name}/ ({exc})")
 
-    print(f"[storage] persistent data: {root} (db, jsondb, clients)")
+    print(f"[storage] persistent data: {root} ({", ".join(RUNTIME_DIRS)})")
     return root

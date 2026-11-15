@@ -109,6 +109,12 @@ class zyrox(commands.AutoShardedBot):
             error = nxt
 
     @staticmethod
+    def _short_reason(error: BaseException) -> str:
+        """One-line reason for the generic error reply (kept short and clean)."""
+        text = str(error).replace("`", "'").replace("\n", " ").strip()
+        return text[:140]
+
+    @staticmethod
     def _log_command_error(kind: str, name: str, user, error: BaseException) -> None:
         try:
             import os, datetime
@@ -149,7 +155,8 @@ class zyrox(commands.AutoShardedBot):
                 else f"❌ I couldn't read the `{option}` option — pick it again from Discord's list."
             )
         else:
-            message = f"❌ Something went wrong (`{type(original).__name__}`). It was logged — try again in a moment."
+            reason = self._short_reason(original)
+            message = f"❌ Something went wrong (`{type(original).__name__}`" + (f": {reason}" if reason else "") + "). It was logged — report it if it keeps happening."
 
         try:
             if interaction.response.is_done():
@@ -183,7 +190,8 @@ class zyrox(commands.AutoShardedBot):
         elif isinstance(original, commands.CheckFailure):
             text = f"🔒 {original}" if str(original) else "🔒 You can't use this command here."
         else:
-            text = f"❌ Something went wrong (`{type(original).__name__}`). It was logged — try again in a moment."
+            reason = self._short_reason(original)
+            text = f"❌ Something went wrong (`{type(original).__name__}`" + (f": {reason}" if reason else "") + "). It was logged — report it if it keeps happening."
 
         try:
             await ctx.send(embed=discord.Embed(description=text, color=0xFF0000))
